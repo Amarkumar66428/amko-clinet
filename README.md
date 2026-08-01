@@ -1,4 +1,4 @@
-# 🐝 HiveHub – Frontend
+# 🐝 amko – Frontend
 
 Welcome to **HiveHub**, an invite-only SaaS eCommerce platform where entrepreneurs can launch, manage, and grow their online stores with powerful tools including AI features, affiliate systems, tiered memberships, and custom marketing.
 

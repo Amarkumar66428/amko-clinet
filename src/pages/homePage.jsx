@@ -74,13 +74,10 @@ export default function HomePage() {
             sx={{ justifyContent: "space-between", py: 1 }}
           >
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Box
-                sx={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  bgcolor: "#0f172a",
-                }}
+              <img
+                src="/amko.png"
+                alt="AMKO Logo"
+                style={{ width: 35, height: 35 }}
               />
               <Typography
                 variant="h6"
@@ -388,6 +385,7 @@ export default function HomePage() {
                 {/* Light Card 2 */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Card
+                    onClick={() => navigate("/amko/billing")}
                     sx={{
                       bgcolor: "#ffffff",
                       border: "1px solid #e2e8f0",
@@ -567,7 +565,7 @@ export default function HomePage() {
                   "Client address book management",
                   "One-click receipt email dispatch",
                 ].map((feature) => (
-                  <Grid item xs={12} sm={6} key={feature}>
+                  <Grid size={{ xs: 12, sm: 6 }} key={feature}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <CheckCircleIcon
                         sx={{ color: "#0f172a", fontSize: 20 }}
@@ -1113,13 +1111,10 @@ export default function HomePage() {
                 alignItems="center"
                 sx={{ mb: 2 }}
               >
-                <Box
-                  sx={{
-                    width: 14,
-                    height: 14,
-                    borderRadius: "50%",
-                    bgcolor: "#0f172a",
-                  }}
+                <img
+                  src="/amko.png"
+                  alt="AMKO Logo"
+                  style={{ width: 35, height: 35 }}
                 />
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   AMKO

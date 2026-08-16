@@ -1,6 +1,4 @@
-import {
-  Dashboard,
-} from "@mui/icons-material";
+import { Dashboard } from "@mui/icons-material";
 import { SUPER_ADMIN, STORE_OWNER } from "../constant/LookupConst.js";
 import asyncComponent from "../utils/asyncComponent.jsx";
 import React from "react";
@@ -23,12 +21,21 @@ export const publicRouters = [
     component: asyncComponent(() => import("../pages/auth/signup/index.jsx")),
     isLayout: false,
     showInMenu: false,
-  },{
+  },
+  {
     path: "/amko/builder",
-    component: asyncComponent(() => import("../pages/user/createStore/websiteBuilder.jsx")),
+    component: asyncComponent(
+      () => import("../pages/user/createStore/storeForm.jsx"),
+    ),
     isLayout: false,
     showInMenu: false,
-  }
+  },
+  {
+    path: "/amko/billing",
+    component: asyncComponent(() => import("../pages/user/bills/maker.jsx")),
+    isLayout: false,
+    showInMenu: false,
+  },
 ];
 
 export const appRouters = [
@@ -36,8 +43,8 @@ export const appRouters = [
     path: "/user/dashboard",
     title: "Dashboard",
     icon: React.createElement(Dashboard),
-    component: asyncComponent(() =>
-      import("../pages/user/dashboard/index.jsx")
+    component: asyncComponent(
+      () => import("../pages/user/dashboard/index.jsx"),
     ),
     isLayout: true,
     showInMenu: true,

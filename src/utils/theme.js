@@ -4,16 +4,16 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#801B7C",
+      main: "#fe7f2d",
     },
     secondary: {
-      main: "#000",
+      main: "#fcca46",
     },
     background: {
       default: "#f4f6f8",
     },
     text: {
-      primary: "#1a1a1a",
+      primary: "#233d4d",
     },
     grey: {
       50: "#f9f9f9",
@@ -35,26 +35,6 @@ const theme = createTheme({
       300: "#e57373",
       400: "#ef5350",
       500: "#f44336",
-    },
-  },
-  typography: {
-    fontFamily: "'Inter', sans-serif",
-    h1: {
-      fontSize: "2.5rem",
-      fontWeight: 700,
-    },
-    body1: {
-      fontSize: "1rem",
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: "8px",
-          textTransform: "none",
-        },
-      },
     },
   },
 });

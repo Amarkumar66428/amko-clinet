@@ -6,7 +6,7 @@ import { Navigate } from "react-router-dom";
 import { message } from "antd";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/v2`,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

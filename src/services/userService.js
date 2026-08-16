@@ -6,7 +6,7 @@ const buySubscription = async (payload) => {
 };
 
 const getUserdata = async () => {
-  const response = await api.get("/user/getUserData");
+  const response = await api.get("/user/profile");
   return response.data;
 };
 

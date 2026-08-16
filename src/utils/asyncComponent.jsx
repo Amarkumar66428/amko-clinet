@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, memo, useState, useEffect } from "react";
-import AppLoading from "../pages/hiveloading";
+import AppLoading from "../pages/amkoloading";
 
 const componentCache = new WeakMap();
 

@@ -1,8 +1,8 @@
 import * as React from "react";
+import { useRef } from "react";
 import PropTypes from "prop-types";
 import { Box } from "@mui/system";
-import { useRef } from "react";
-import { TextField } from "@mui/material";
+import { TextField, useTheme } from "@mui/material";
 
 function CodeInput({
   label = "Invite Code",
@@ -12,6 +12,7 @@ function CodeInput({
   separator,
   size,
 }) {
+  const theme = useTheme();
   const inputRefs = useRef(new Array(length).fill(null));
 
   const focusInput = (index) => inputRefs.current[index]?.focus();
@@ -86,7 +87,13 @@ function CodeInput({
         flexDirection: "column",
       }}
     >
-      <label style={{ fontWeight: 500, marginBottom: 4, color: "#fff" }}>
+      <label
+        style={{
+          fontWeight: 500,
+          marginBottom: 4,
+          color: theme.palette.text.primary,
+        }}
+      >
         {label}
       </label>
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
@@ -102,14 +109,13 @@ function CodeInput({
                 maxLength: 1,
                 style: {
                   textAlign: "center",
-                  fontSize: "1.25rem",
+                  fontSize: "0.875rem",
                   width: size,
                   height: size,
                 },
               }}
               sx={{
                 "& .MuiOutlinedInput-root": {
-                  backgroundColor: "#fbfcfc70",
                   borderRadius: "8px",
                   "& fieldset": {
                     borderColor: "#ccc",
@@ -125,7 +131,7 @@ function CodeInput({
                   },
                 },
                 input: {
-                  color: "#fff",
+                  color: theme.palette.text.primary,
                 },
               }}
               variant="outlined"

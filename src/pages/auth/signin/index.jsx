@@ -20,11 +20,10 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import userService from "../../../services/userService";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../../../reducer/authSlice";
-import { encryptData } from "../../../utils/encryption";
+import video from "../../../../public/amko.mp4";
 
-const textFieldStyles = {
+const getTextFieldStyles = (theme) => ({
   "& .MuiOutlinedInput-root": {
-    backgroundColor: "#fbfcfc70",
     borderRadius: "8px",
     "& fieldset": {
       borderColor: "#ccc",
@@ -37,16 +36,14 @@ const textFieldStyles = {
     },
     "& input": {
       padding: "12px",
-      color: "#fff",
-      caretColor: "#fff",
+      color: theme.palette.text.primary,
     },
   },
-};
+});
 
 const Signin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isAdminSignIn, setIsAdminSignIn] = useState(false);
   const { showSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -66,18 +63,7 @@ const Signin = () => {
       setIsLoading(true);
       const body = { email: form.email, password: form.password };
 
-      if (isAdminSignIn) {
-        const response = await authService?.adminSignIn(body);
-        if (!response?.data) return;
-
-        Cookies.set("access_token", response?.data?.token, { expires: 1 });
-        const role = encryptData("admin");
-        localStorage.setItem("role", role);
-
-        dispatch(setUserData({ user: response?.data }));
-        showSnackbar("Login successful", "success");
-        navigate("/admin/dashboard");
-      } else {
+      
         const response = await authService?.signIn(body);
         if (!response?.data?.token) return;
         Cookies.set("access_token", response?.data?.token, { expires: 1 });
@@ -90,8 +76,7 @@ const Signin = () => {
             })
           );
           showSnackbar("Login successful", "success");
-          navigate("/user/dashboard");
-        }
+        navigate("/user/dashboard");
       }
     } catch (error) {
       showSnackbar(error?.message || "Login failed", "error");
@@ -103,6 +88,11 @@ const Signin = () => {
 
   return (
     <section className="welcome-page signup-page">
+      <main className="welcome-content">
+        <figure>
+          <video src={video} autoPlay muted loop />
+        </figure>
+      </main>
       <Box
         display="flex"
         flexDirection="column"
@@ -120,7 +110,11 @@ const Signin = () => {
       >
         <Typography
           variant="h4"
-          sx={{ color: "#fff", textAlign: "center", fontWeight: 600 }}
+          sx={{
+            color: "text.primary",
+            textAlign: "center",
+            fontWeight: 600,
+          }}
         >
           Sign In
         </Typography>
@@ -151,9 +145,9 @@ const Signin = () => {
         <Divider
           sx={{
             width: "100%",
-            color: "#fff",
+            color: "text.secondary",
             "&::before, &::after": {
-              borderColor: "#fff",
+              borderColor: "divider",
             },
           }}
         >
@@ -163,25 +157,39 @@ const Signin = () => {
         <form style={{ width: "100%" }} onSubmit={handleSignIn}>
           <Box display="flex" flexDirection="column" gap={3}>
             <Box display="flex" flexDirection="column" gap={1}>
-              <label style={{ fontWeight: 500, color: "#fff" }}>Email</label>
+              <label
+                style={{
+                  fontWeight: 500,
+                  color: theme.palette.text.primary,
+                }}
+              >
+                Email
+              </label>
               <TextField
                 variant="outlined"
                 placeholder="demo@example.com"
                 fullWidth
-                sx={textFieldStyles}
+                sx={getTextFieldStyles(theme)}
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </Box>
 
             <Box display="flex" flexDirection="column" gap={1}>
-              <label style={{ fontWeight: 500, color: "#fff" }}>Password</label>
+              <label
+                style={{
+                  fontWeight: 500,
+                  color: theme.palette.text.primary,
+                }}
+              >
+                Password
+              </label>
               <TextField
                 type={showPassword ? "text" : "password"}
                 variant="outlined"
                 placeholder="Enter your password"
                 fullWidth
-                sx={textFieldStyles}
+                sx={getTextFieldStyles(theme)}
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 InputProps={{
@@ -190,7 +198,7 @@ const Signin = () => {
                       <IconButton
                         onClick={() => setShowPassword((prev) => !prev)}
                         edge="end"
-                        sx={{ color: "#fff" }}
+                        sx={{ color: "text.secondary" }}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -216,8 +224,6 @@ const Signin = () => {
                 px: 2,
                 py: 1.2,
                 fontSize: "1rem",
-                backgroundImage:
-                  "linear-gradient(to bottom, #801B7C, #651562, #4E104C, #1A0519)",
                 color: "#fff",
                 "&:hover": {
                   opacity: 0.9,
@@ -236,7 +242,7 @@ const Signin = () => {
         <Typography
           variant="body2"
           sx={{
-            color: "#fff",
+            color: "text.primary",
             textAlign: "center",
             fontFamily: "Open Sans",
           }}
@@ -245,31 +251,14 @@ const Signin = () => {
           <Link
             to="/auth/signup"
             style={{
-              color: "#801B7C",
-              textDecoration: "none",
+              color: theme.palette.primary.main,
               fontWeight: 500,
+              textDecoration: "none",
             }}
           >
             Sign Up
           </Link>
         </Typography>
-
-        <Button
-          variant="text"
-          onClick={() => setIsAdminSignIn((prev) => !prev)}
-          sx={{
-            color: "#fff",
-            textTransform: "none",
-            fontWeight: 500,
-            fontSize: "0.875rem",
-            fontFamily: "Open Sans",
-            "&:hover": {
-              textDecoration: "underline",
-            },
-          }}
-        >
-          Switch to {!isAdminSignIn ? "Admin" : "User"} Signin
-        </Button>
       </Box>
     </section>
   );

@@ -4,7 +4,6 @@ body {
   place-items: center;
   min-height: 100vh;
   font-family: "Open Sans" !important;
-  color: #000;
 }
 
 #root {
@@ -37,357 +36,271 @@ figure {
   margin: 0;
 }
 
-.welcome-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  width: 100%;
-  height: 100vh;
+.stats-section {
   position: relative;
-  font-family: "Open Sans" !important;
-
-  background: url("../assets/welcomePage/image1.png") center/contain no-repeat;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-
-    background: url("../assets/welcomePage/shade.png") center/contain no-repeat;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.116);
-    z-index: -1;
-  }
+  overflow: hidden;
+  padding: 80px 0;
+  color: #fff;
 }
 
-.global-loading {
+.stats-section::before {
+  content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fbfcfc;
+  inset: -15% 0;
+
+  background-image:
+    linear-gradient(135deg, rgba(7, 13, 31, 0.78), rgba(11, 19, 41, 0.65)),
+    var(--stats-bg);
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  z-index: 0;
+  pointer-events: none;
 }
 
-.signup-page {
+.stats-content {
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-page.signup-page {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  background: #f4f7fb;
+  overflow: hidden;
+}
+
+/* =========================
+   LEFT VIDEO SECTION
+========================= */
+
+.welcome-page.signup-page .welcome-content {
+  position: relative;
+  width: 55%;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #0b1329;
+}
+
+.welcome-page.signup-page .welcome-content figure {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.welcome-page.signup-page .welcome-content video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Dark cinematic overlay */
+.welcome-page.signup-page .welcome-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    135deg,
+    rgba(7, 13, 31, 0.55),
+    rgba(7, 13, 31, 0.12) 50%,
+    rgba(7, 13, 31, 0.55)
+  );
+
+  pointer-events: none;
+}
+
+/* =========================
+   RIGHT LOGIN SECTION
+========================= */
+
+.welcome-page.signup-page > .MuiBox-root {
+  position: relative;
+
+  width: 45%;
+  max-width: none;
+
+  min-height: 100dvh;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+
+  padding: 48px 7% !important;
+
+  background:
+    radial-gradient(
+      circle at 15% 15%,
+      rgba(59, 130, 246, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(145deg, #f8fafc, #eef3f8);
+
+  box-shadow: -12px 0 35px rgba(15, 23, 42, 0.08);
+
+  z-index: 2;
 }
 
-/* Content stays above the overlay */
-.welcome-content {
-  text-align: center;
-  color: white;
+/* =========================
+   FORM WIDTH
+========================= */
 
-  h1 {
-    font-size: 4rem;
-    margin: 0;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-  }
-  p {
-    font-family: "Orienta";
-    font-size: 0.875rem;
-    letter-spacing: 4px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-    margin: 0;
-  }
-}
-
-.sidebar {
-  height: 100vh;
-  background-image: linear-gradient(
-    to top,
-    #801b7c 5%,
-    #651562 15%,
-    #4e104c 25%,
-    #450e42 30%,
-    #1a0519 70%
-  );
-}
-
-.sidebar-mobile {
-  height: 100vh;
-  @media screen and (max-width: 1024px) {
-    position: fixed;
-    top: 0;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 999;
-    padding-top: 2.8em;
-
-    .sidebar-title {
-      display: none;
-    }
-  }
-}
-
-.sidebar-open {
-  @media screen and (max-width: 1024px) {
-    transform: translateX(0);
-  }
-}
-
-.app-main-header {
-  height: 2.8em;
-  position: sticky;
-  top: 0;
-  z-index: 9999;
-  background-image: linear-gradient(
-    to left,
-    #801b7c 5%,
-    #651562 15%,
-    #4e104c 25%,
-    #450e42 30%,
-    #1a0519 70%
-  );
-
-  @media screen and (min-width: 1024px) {
-    display: none;
-  }
-}
-
-.store-editor-header {
-  background-image: linear-gradient(
-    to left,
-    #801b7c 5%,
-    #651562 15%,
-    #4e104c 25%,
-    #450e42 30%,
-    #1a0519 70%
-  );
-}
-
-.header-hamburger {
-  display: flex;
-  align-items: center;
-  padding: 0 1em;
-  cursor: pointer;
-
-  input {
-    display: none;
-  }
-
-  svg {
-    height: 2em;
-    transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
-
-    .line {
-      fill: none;
-      stroke: white;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 3;
-      transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
-        stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
-
-      &.line-top-bottom {
-        stroke-dasharray: 12 63;
-      }
-    }
-  }
-
-  input:checked + svg {
-    transform: rotate(-45deg);
-
-    .line-top-bottom {
-      stroke-dasharray: 20 300;
-      stroke-dashoffset: -32.42;
-    }
-  }
-}
-
-.community-like-dislike-container {
-  .con-like {
-    --red: rgb(255, 50, 50);
-    --gray: #707070;
-    position: relative;
-    width: 1.4em;
-    height: 1.4em;
-
-    .like {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      z-index: 20;
-      cursor: pointer;
-    }
-
-    .checkmark {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .outline,
-      .filled {
-        fill: var(--gray);
-        position: absolute;
-      }
-
-      .filled {
-        display: none;
-        animation: kfr-filled 0.5s;
-      }
-
-      .celebrate {
-        position: absolute;
-        display: none;
-        animation: kfr-celebrate 0.5s forwards;
-      }
-
-      .poly {
-        stroke: var(--red);
-        fill: var(--red);
-      }
-    }
-
-    .like:checked ~ .checkmark {
-      .celebrate {
-        display: block;
-      }
-    }
-
-    .like:checked ~ .checkmark {
-      .filled {
-        display: block;
-        fill: var(--red);
-      }
-    }
-  }
-}
-
-// Animations
-@keyframes kfr-filled {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}
-
-@keyframes kfr-celebrate {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.2);
-    opacity: 0;
-    display: none;
-  }
-}
-
-.welcome-page.signup-page {
-  .shine-text {
-    position: relative;
-    display: inline-block;
-    font-weight: bold;
-    background: linear-gradient(
-      120deg,
-      #ffffff 0%,
-      #c4c4c4 50%,
-      #797979 70%,
-      #e4e3e3 100%,
-      #ffffff 100%
-    );
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: elegant-white-shine 2s ease-in-out infinite;
-  }
-
-  @keyframes elegant-white-shine {
-    0% {
-      background-position: -100% center;
-    }
-    100% {
-      background-position: 100% center;
-    }
-  }
-}
-
-.template-image {
-  width: 20rem;
-  height: 25rem;
-  overflow: hidden;
-
-  img {
-    transition: transform 0.3s ease-in-out;
-
-    &:hover {
-      transform: scale(1.1);
-    }
-  }
-}
-
-.plan-active-switch {
-  .ant-switch-inner {
-    color: #fff;
-  }
-
-  &.ant-switch-checked {
-    background-color: #52c41a !important;
-  }
-
-  &:not(.ant-switch-checked) {
-    background-color: #ff4d4f !important;
-  }
-}
-
-.store-editor {
-  .color-picker {
-    .ant-color-picker-color-block {
-      width: 100%;
-    }
-  }
-}
-
-.public-app-phone-input {
+.welcome-page.signup-page form {
   width: 100%;
-  height: 100%;
-  .react-tel-input {
-    height: 100%;
+}
+
+.welcome-page.signup-page .MuiBox-root {
+  box-sizing: border-box;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+
+.welcome-page.signup-page h4 {
+  margin-bottom: 8px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  color: #0f172a;
+}
+
+/* =========================
+   GOOGLE BUTTON
+========================= */
+
+.welcome-page.signup-page button {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.welcome-page.signup-page button:hover {
+  transform: translateY(-1px);
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.welcome-page.signup-page .MuiTextField-root {
+  width: 100%;
+}
+
+.welcome-page.signup-page .MuiOutlinedInput-root {
+  min-height: 48px;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.welcome-page.signup-page .MuiOutlinedInput-root:hover {
+  background: #ffffff;
+}
+
+.welcome-page.signup-page .MuiOutlinedInput-root.Mui-focused {
+  background: #ffffff;
+
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* =========================
+   DIVIDER
+========================= */
+
+.welcome-page.signup-page .MuiDivider-root {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* =========================
+   SIGN IN BUTTON
+========================= */
+
+.welcome-page.signup-page button[type="submit"] {
+  min-height: 48px;
+
+  border-radius: 10px;
+
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+}
+
+.welcome-page.signup-page button[type="submit"]:hover {
+  background: linear-gradient(135deg, #1d4ed8, #4338ca);
+
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28);
+}
+
+/* =========================
+   SIGN UP LINK
+========================= */
+
+.welcome-page.signup-page a {
+  transition: color 0.2s ease;
+}
+
+.welcome-page.signup-page a:hover {
+  text-decoration: underline !important;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+  .welcome-page.signup-page {
+    display: block;
+    min-height: 100dvh;
+    overflow-y: auto;
   }
 
-  .search-box {
-    width: 90%;
-    background: transparent;
-    color: #000;
+  .welcome-page.signup-page .welcome-content {
+    width: 100%;
+    height: 240px;
+    min-height: 240px;
+  }
+
+  .welcome-page.signup-page > .MuiBox-root {
+    width: 100%;
+    min-height: calc(100dvh - 240px);
+
+    padding: 40px 24px !important;
+
+    box-shadow: none;
   }
 }
 
-.website-header {
-  background-color: #f8f9fa;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 9999;
-}
+@media (max-width: 600px) {
+  .welcome-page.signup-page .welcome-content {
+    height: 190px;
+    min-height: 190px;
+  }
 
-.ant-picker-dropdown {
-  z-index: 1500 !important;
+  .welcome-page.signup-page > .MuiBox-root {
+    min-height: calc(100dvh - 190px);
+
+    padding: 32px 20px !important;
+  }
+
+  .welcome-page.signup-page h4 {
+    font-size: 1.7rem;
+  }
 }

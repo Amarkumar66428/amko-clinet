@@ -2,9 +2,26 @@
   height: 100%;
   width: 100%;
 }
+
+:root {
+  /* Fluid Typography Scale (Mobile min -> Desktop max) */
+  --fontSize-xs: clamp(0.75rem, 0.72rem + 0.14vw, 0.8rem);       /* 12px -> 12.8px */
+  --fontSize-sm: clamp(0.875rem, 0.82rem + 0.22vw, 1rem);        /* 14px -> 16px */
+  --fontSize-md: clamp(1rem, 0.93rem + 0.31vw, 1.25rem);         /* 16px -> 20px (Base/Body) */
+  --fontSize-lg: clamp(1.25rem, 1.14rem + 0.46vw, 1.563rem);     /* 20px -> 25px */
+  --fontSize-xl: clamp(1.563rem, 1.41rem + 0.65vw, 1.953rem);    /* 25px -> 31.25px */
+  --fontSize-2xl: clamp(1.953rem, 1.73rem + 0.94vw, 2.441rem);   /* 31.25px -> 39px */
+  --fontSize-3xl: clamp(2.441rem, 2.13rem + 1.34vw, 3.052rem);   /* 39px -> 48.8px */
+  --fontSize-4xl: clamp(3.052rem, 2.61rem + 1.88vw, 3.815rem);   /* 48.8px -> 61px */
+}
+
+body {
+  font-size: var(--fontSize-sm);
+  line-height: 1.5;
+}
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(180, 180, 180, 0.4) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -17,12 +34,7 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(180, 180, 180, 0.4);
   border-radius: 8px;
   background-clip: padding-box;
   border: 1px solid transparent;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(180, 180, 180, 0.6);
 }

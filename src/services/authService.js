@@ -7,12 +7,12 @@ const adminSignIn = async (payload) => {
 };
 
 const signUp = async (payload) => {
-  const response = await api.post("/user/signup", payload);
+  const response = await api.post("/auth/register", payload);
   return response.data;
 };
 
 const signIn = async (payload) => {
-  const response = await api.post("/user/login", payload);
+  const response = await api.post("/auth/login", payload);
   return response.data;
 };
 

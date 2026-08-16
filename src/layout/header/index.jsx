@@ -35,7 +35,7 @@ const Header = ({ openSideBar, setSideBar }) => {
             textAlign: "center",
           }}
         >
-          HivvHub
+          Amko
         </Typography>
       </Box>
     </header>

@@ -7,8 +7,6 @@ import ServerError from "./pages/ServerError";
 import { Provider } from "react-redux";
 import { store } from "./app/store";
 import "./sass/global.scss";
-import "./sass/temp1.scss";
-import "./sass/temp3.scss";
 import "./App.css";
 
 function App() {

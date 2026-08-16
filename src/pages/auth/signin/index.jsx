@@ -17,9 +17,6 @@ import Cookies from "js-cookie";
 import authService from "../../../services/authService";
 import { useSnackbar } from "../../../features/snackBar";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import userService from "../../../services/userService";
-import { useDispatch } from "react-redux";
-import { setUserData } from "../../../reducer/authSlice";
 import video from "../../../../public/amko.mp4";
 
 const getTextFieldStyles = (theme) => ({
@@ -43,7 +40,6 @@ const getTextFieldStyles = (theme) => ({
 
 const Signin = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { showSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -67,17 +63,8 @@ const Signin = () => {
         const response = await authService?.signIn(body);
         if (!response?.data?.token) return;
         Cookies.set("access_token", response?.data?.token, { expires: 1 });
-        const userData = await userService.getUserdata();
-        if (userData) {
-          dispatch(
-            setUserData({
-              user: userData?.user,
-              subscription: userData?.subscription,
-            })
-          );
-          showSnackbar("Login successful", "success");
+        showSnackbar("Login successful", "success");
         navigate("/user/dashboard");
-      }
     } catch (error) {
       showSnackbar(error?.message || "Login failed", "error");
       console.error(error);

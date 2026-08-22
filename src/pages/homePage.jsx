@@ -385,7 +385,7 @@ export default function HomePage() {
                 {/* Light Card 2 */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <Card
-                    onClick={() => navigate("/amko/billing")}
+                    onClick={() => navigate("/invoice/templates")}
                     sx={{
                       bgcolor: "#ffffff",
                       border: "1px solid #e2e8f0",

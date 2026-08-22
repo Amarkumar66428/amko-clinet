@@ -1,0 +1,1136 @@
+// invoice.scss
+
+// --------------------------------------------------
+// Variables
+// --------------------------------------------------
+
+$bg: #f5f7fb;
+$surface: #ffffff;
+$surface-soft: #f8fafc;
+
+$text: #172033;
+$text-muted: #64748b;
+$text-light: #94a3b8;
+
+$border: #e2e8f0;
+$border-strong: #cbd5e1;
+
+$primary: #2563eb;
+$primary-hover: #1d4ed8;
+$primary-soft: #eff6ff;
+
+$success: #15803d;
+$success-soft: #dcfce7;
+
+$danger: #dc2626;
+$danger-soft: #fee2e2;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 18px;
+$radius-xl: 24px;
+
+$shadow-sm:
+  0 1px 2px rgba(15, 23, 42, 0.04),
+  0 1px 4px rgba(15, 23, 42, 0.04);
+
+$shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+
+$shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.12);
+
+// --------------------------------------------------
+// Global invoice feature reset
+// --------------------------------------------------
+
+.template-page,
+.invoice-builder {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+// ==================================================
+// TEMPLATE SELECTION PAGE
+// ==================================================
+
+.template-page {
+  min-height: 100vh;
+  background: $bg;
+  color: $text;
+
+  padding: 48px clamp(20px, 4vw, 64px) 80px;
+}
+
+// --------------------------------------------------
+// Hero
+// --------------------------------------------------
+
+.template-hero {
+  width: 100%;
+  max-width: 1440px;
+
+  margin: 0 auto 32px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 32px;
+
+  h1 {
+    margin: 8px 0 10px;
+
+    font-size: clamp(28px, 4vw, 46px);
+
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+
+    color: $text;
+  }
+
+  p {
+    margin: 0;
+
+    max-width: 660px;
+
+    color: $text-muted;
+
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+
+    color: $primary;
+  }
+}
+
+.template-search {
+  width: min(100%, 360px);
+
+  height: 48px;
+
+  padding: 0 16px;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-md;
+
+  background: $surface;
+
+  color: $text;
+
+  outline: none;
+
+  box-shadow: $shadow-sm;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+
+  &::placeholder {
+    color: $text-light;
+  }
+
+  &:focus {
+    border-color: $primary;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+}
+
+// --------------------------------------------------
+// Category filters
+// --------------------------------------------------
+
+.category-filter {
+  width: 100%;
+  max-width: 1440px;
+
+  margin: 0 auto 28px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  overflow-x: auto;
+
+  padding-bottom: 4px;
+
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  button {
+    flex: 0 0 auto;
+
+    border: 1px solid $border;
+
+    background: $surface;
+
+    color: $text-muted;
+
+    padding: 9px 14px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition:
+      background 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease;
+
+    &:hover {
+      color: $text;
+      border-color: $border-strong;
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    &.active {
+      background: $text;
+      color: #ffffff;
+      border-color: $text;
+    }
+  }
+}
+
+// --------------------------------------------------
+// Template grid
+// --------------------------------------------------
+
+.template-grid {
+  width: 100%;
+  max-width: 1440px;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+
+  gap: 24px;
+}
+
+.template-card {
+  min-width: 0;
+
+  background: $surface;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  box-shadow: $shadow-sm;
+
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+
+    border-color: rgba(37, 99, 235, 0.25);
+
+    box-shadow: $shadow-md;
+  }
+}
+
+.template-preview {
+  width: 100%;
+
+  padding: 0;
+
+  border: none;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  background: linear-gradient(145deg, #eef2f7, #f8fafc);
+
+  aspect-ratio: 210 / 297;
+
+  position: relative;
+
+  display: block;
+
+  img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition: transform 0.3s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.015);
+  }
+}
+
+.template-footer{
+  padding: 0px 10px 10px;
+}
+
+.template-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 0px 4px 10px;
+
+  > div {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+  }
+
+  strong {
+    color: $text;
+
+    font-size: 15px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span {
+    color: $text-muted;
+    font-size: 12px;
+  }
+}
+
+.free-badge {
+  flex: 0 0 auto;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: $success-soft !important;
+
+  color: $success !important;
+
+  font-weight: 700;
+  font-size: 11px !important;
+}
+
+.use-template-btn {
+  width: 100%;
+
+  border: none;
+
+  border-radius: $radius-md;
+
+  background: $text;
+
+  color: #ffffff;
+
+  padding: 11px 14px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+
+  &:hover {
+    background: $primary;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// --------------------------------------------------
+// Template loading
+// --------------------------------------------------
+
+.template-loading,
+.editor-loading {
+  min-height: 100vh;
+
+  display: grid;
+  place-items: center;
+
+  background: $bg;
+
+  color: $text-muted;
+
+  font-size: 14px;
+}
+
+// ==================================================
+// INVOICE EDITOR
+// ==================================================
+
+.invoice-builder {
+  min-height: 100vh;
+
+  background: $bg;
+
+  color: $text;
+}
+
+// --------------------------------------------------
+// Toolbar
+// --------------------------------------------------
+
+.invoice-toolbar {
+  height: 72px;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 50;
+
+  background: rgba(255, 255, 255, 0.92);
+
+  backdrop-filter: blur(16px);
+
+  border-bottom: 1px solid $border;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 clamp(16px, 3vw, 36px);
+
+  gap: 20px;
+
+  > div {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+
+    > div {
+      min-width: 0;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 2px;
+    }
+  }
+
+  strong {
+    color: $text;
+    font-size: 14px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  small {
+    color: $text-muted;
+    font-size: 11px;
+  }
+}
+
+.back-btn {
+  height: 38px;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  background: $surface;
+
+  color: $text;
+
+  padding: 0 12px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+
+  &:hover {
+    background: $surface-soft;
+    border-color: $border-strong;
+  }
+}
+
+.download-btn {
+  height: 42px;
+
+  border: none;
+
+  border-radius: $radius-md;
+
+  background: $primary;
+
+  color: #ffffff;
+
+  padding: 0 18px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.18);
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    opacity 0.18s ease;
+
+  &:hover:not(:disabled) {
+    background: $primary-hover;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.6;
+  }
+}
+
+// --------------------------------------------------
+// Editor layout
+// --------------------------------------------------
+
+.invoice-builder-layout {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(360px, 520px)
+    minmax(600px, 1fr);
+
+  min-height: calc(100vh - 72px);
+}
+
+.invoice-controls {
+  min-width: 0;
+
+  padding: 24px;
+
+  border-right: 1px solid $border;
+
+  background: $surface-soft;
+
+  overflow: visible;
+}
+
+.invoice-editor-fields {
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+// --------------------------------------------------
+// Cards
+// --------------------------------------------------
+
+.editor-card {
+  background: $surface;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  padding: 18px;
+
+  box-shadow: $shadow-sm;
+
+  h3 {
+    margin: 0 0 16px;
+
+    color: $text;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    letter-spacing: -0.01em;
+  }
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0;
+  }
+
+  button {
+    border: none;
+
+    background: $primary-soft;
+
+    color: $primary;
+
+    border-radius: $radius-sm;
+
+    padding: 8px 10px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition: background 0.18s ease;
+
+    &:hover {
+      background: #dbeafe;
+    }
+  }
+}
+
+// --------------------------------------------------
+// Form fields
+// --------------------------------------------------
+
+.field-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  margin-bottom: 13px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  > span {
+    color: $text-muted;
+
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+
+    border: 1px solid $border;
+
+    border-radius: $radius-sm;
+
+    background: #ffffff;
+
+    color: $text;
+
+    outline: none;
+
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease,
+      background 0.18s ease;
+  }
+
+  input,
+  select {
+    height: 40px;
+
+    padding: 0 11px;
+  }
+
+  textarea {
+    min-height: 76px;
+
+    padding: 10px 11px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: $primary;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+}
+
+// --------------------------------------------------
+// Line items
+// --------------------------------------------------
+
+.line-item {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr)
+    80px
+    110px
+    36px;
+
+  gap: 10px;
+
+  align-items: end;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid $border;
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .field {
+    margin: 0;
+  }
+}
+
+.remove-item {
+  width: 36px;
+  height: 40px;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  background: $surface;
+
+  color: $text-muted;
+
+  font-size: 20px;
+
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+
+  &:hover {
+    color: $danger;
+
+    border-color: rgba(220, 38, 38, 0.25);
+
+    background: $danger-soft;
+  }
+}
+
+// --------------------------------------------------
+// Appearance controls
+// --------------------------------------------------
+
+.range-row {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  input[type="range"] {
+    flex: 1;
+
+    height: auto;
+
+    padding: 0;
+
+    box-shadow: none;
+  }
+
+  strong {
+    min-width: 38px;
+
+    text-align: right;
+
+    font-size: 12px;
+
+    color: $text;
+  }
+}
+
+.color-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-top: 13px;
+
+  span {
+    color: $text-muted;
+
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  input[type="color"] {
+    width: 44px;
+    height: 32px;
+
+    padding: 2px;
+
+    border: 1px solid $border;
+
+    border-radius: 7px;
+
+    background: $surface;
+
+    cursor: pointer;
+  }
+}
+
+// ==================================================
+// PREVIEW
+// ==================================================
+
+.preview-column {
+  min-width: 0;
+
+  background: #e9edf4;
+
+  padding: 22px clamp(20px, 4vw, 52px) 50px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+}
+
+.preview-heading {
+  width: 100%;
+  max-width: 900px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+
+  > div {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+  }
+
+  span {
+    color: $text;
+
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  small {
+    padding: 3px 7px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.65);
+
+    color: $text-muted;
+
+    font-size: 10px;
+  }
+
+  > strong {
+    color: $text;
+
+    font-size: 13px;
+  }
+}
+
+.invoice-preview-shell {
+  width: 100%;
+
+  max-width: 900px;
+
+  display: flex;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.invoice-preview-frame {
+  display: block;
+
+  width: 794px;
+  height: 1123px;
+
+  flex: 0 0 auto;
+
+  border: none;
+
+  background: #ffffff;
+
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.14);
+
+  transform-origin: top center;
+}
+
+// ==================================================
+// RESPONSIVE
+// ==================================================
+
+@media (max-width: 1180px) {
+  .invoice-builder-layout {
+    grid-template-columns:
+      minmax(330px, 430px)
+      minmax(500px, 1fr);
+  }
+
+  .invoice-controls {
+    padding: 18px;
+  }
+
+  .preview-column {
+    padding: 20px;
+  }
+
+  .invoice-preview-shell {
+    overflow-x: auto;
+
+    justify-content: flex-start;
+
+    padding-bottom: 10px;
+  }
+}
+
+@media (max-width: 980px) {
+  .template-hero {
+    align-items: stretch;
+
+    flex-direction: column;
+
+    gap: 20px;
+  }
+
+  .template-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .invoice-toolbar {
+    position: relative;
+  }
+
+  .invoice-builder-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .invoice-controls {
+    border-right: none;
+
+    border-bottom: 1px solid $border;
+  }
+
+  .preview-column {
+    min-height: auto;
+  }
+
+  .invoice-preview-shell {
+    justify-content: center;
+
+    overflow: hidden;
+  }
+
+  .invoice-preview-frame {
+    transform: scale(0.82);
+
+    margin-bottom: -202px;
+  }
+}
+
+@media (max-width: 720px) {
+  .template-page {
+    padding: 28px 16px 60px;
+  }
+
+  .template-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+  }
+
+  .template-card {
+    padding: 8px;
+  }
+
+  .template-card-footer {
+    padding: 10px 2px 8px;
+  }
+
+  .invoice-toolbar {
+    height: auto;
+
+    min-height: 64px;
+
+    padding: 10px 12px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    > div {
+      gap: 8px;
+
+      > div {
+        display: none;
+      }
+    }
+  }
+
+  .download-btn {
+    height: 38px;
+
+    padding: 0 13px;
+  }
+
+  .invoice-controls {
+    padding: 14px;
+  }
+
+  .editor-card {
+    padding: 15px;
+
+    border-radius: $radius-md;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .line-item {
+    grid-template-columns: 1fr 1fr;
+
+    align-items: end;
+
+    padding: 14px 0;
+
+    .field:first-child {
+      grid-column: 1 / -1;
+    }
+
+    .remove-item {
+      grid-column: 2;
+
+      justify-self: end;
+    }
+  }
+
+  .preview-column {
+    padding: 16px 8px 36px;
+  }
+
+  .preview-heading {
+    padding: 0 8px;
+  }
+
+  .invoice-preview-shell {
+    width: 100%;
+  }
+
+  .invoice-preview-frame {
+    transform: scale(0.68);
+
+    margin-bottom: -359px;
+  }
+}
+
+@media (max-width: 520px) {
+  .template-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .template-card {
+    max-width: 340px;
+
+    width: 100%;
+
+    margin: 0 auto;
+  }
+
+  .invoice-preview-frame {
+    transform: scale(0.52);
+
+    margin-bottom: -539px;
+  }
+}
+
+// --------------------------------------------------
+// Reduced motion
+// --------------------------------------------------
+
+@media (prefers-reduced-motion: reduce) {
+  .template-card,
+  .template-preview img,
+  .use-template-btn,
+  .download-btn,
+  .back-btn,
+  .category-filter button,
+  input,
+  select,
+  textarea {
+    transition: none !important;
+  }
+}

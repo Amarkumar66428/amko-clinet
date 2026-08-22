@@ -31,11 +31,17 @@ export const publicRouters = [
     showInMenu: false,
   },
   {
-    path: "/amko/billing",
-    component: asyncComponent(() => import("../pages/user/bills/maker.jsx")),
+    path: "/invoice/templates",
+    component: asyncComponent(() => import("../pages/user/bills/TemplateSelectionPage.jsx")),
     isLayout: false,
     showInMenu: false,
   },
+  {
+    path: "/invoice/editor/:templateId",
+    component: asyncComponent(() => import("../pages/user/bills/InvoiceEditorPage.jsx")),
+    isLayout: false,
+    showInMenu: false,
+  }
 ];
 
 export const appRouters = [

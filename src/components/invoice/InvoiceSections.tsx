@@ -1,8 +1,18 @@
 import { memo, useId, useRef, useState, type ChangeEvent, type Dispatch, type InputHTMLAttributes } from "react";
 import { CURRENCIES, formatMoney } from "@/lib/invoice/format";
 import { LogoError, processLogo } from "@/lib/invoice/logo";
-import { MAX_ITEMS, lineAmount } from "@/lib/invoice/state";
-import type { Invoice, InvoiceAction, InvoiceField, InvoiceItemField, Party, PartyKey } from "@/lib/invoice/types";
+import { MAX_CUSTOM_COLUMNS, MAX_ITEMS, MAX_PARTY_CUSTOM_FIELDS, lineAmount } from "@/lib/invoice/state";
+import type {
+  CustomColumn,
+  Invoice,
+  InvoiceAction,
+  InvoiceField,
+  InvoiceItem,
+  InvoiceItemField,
+  Party,
+  PartyKey,
+  PartyTextField,
+} from "@/lib/invoice/types";
 import { FieldLabel, inputClass, labelTextClass, textareaClass } from "./EditorFields";
 
 // Each section is the body of one toolbar tool; the workspace panel supplies the title and chrome.
@@ -130,13 +140,88 @@ function LogoField({ logo, dispatch }: { logo: string | null; dispatch: Dispatch
   );
 }
 
+const removeButtonClass =
+  "h-10 w-9 shrink-0 rounded-lg border border-slate-200 bg-white text-xl text-slate-500 transition hover:border-red-600/25 hover:bg-red-100 hover:text-red-600";
+
+/** Label/value details the user adds themselves, e.g. GSTIN, PAN, website. */
+function PartyCustomFields({
+  party,
+  fields,
+  dispatch,
+}: {
+  party: PartyKey;
+  fields: Party["customFields"];
+  dispatch: Dispatch<InvoiceAction>;
+}) {
+  const canAdd = fields.length < MAX_PARTY_CUSTOM_FIELDS;
+  return (
+    <div className="mt-1 rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className={labelTextClass}>Custom fields</span>
+        <button
+          type="button"
+          disabled={!canAdd}
+          className={smallButtonClass}
+          onClick={() => dispatch({ type: "ADD_PARTY_CUSTOM_FIELD", party })}
+        >
+          + Add field
+        </button>
+      </div>
+      {fields.length === 0 ? (
+        <p className="mt-2 text-[11px] text-slate-500">
+          Add details like GSTIN, PAN or website. They print as &ldquo;Label: value&rdquo;.
+        </p>
+      ) : (
+        <ul className="mt-2.5 flex flex-col gap-2.5">
+          {fields.map((field, index) => {
+            const name = field.label.trim() || `field ${index + 1}`;
+            const set = (key: "label" | "value") => (e: ChangeEvent<HTMLInputElement>) =>
+              dispatch({ type: "UPDATE_PARTY_CUSTOM_FIELD", party, id: field.id, key, value: e.target.value });
+            return (
+              <li key={field.id} className="flex items-start gap-2">
+                <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-[2fr_3fr]">
+                  <input
+                    className={inputClass}
+                    aria-label={`Custom field ${index + 1} label`}
+                    placeholder="Label, e.g. GSTIN"
+                    maxLength={30}
+                    value={field.label}
+                    onChange={set("label")}
+                  />
+                  <input
+                    className={inputClass}
+                    aria-label={`Value for ${name}`}
+                    placeholder="Value"
+                    maxLength={120}
+                    value={field.value}
+                    onChange={set("value")}
+                  />
+                </div>
+                <button
+                  type="button"
+                  aria-label={`Remove ${name}`}
+                  className={removeButtonClass}
+                  onClick={() => dispatch({ type: "REMOVE_PARTY_CUSTOM_FIELD", party, id: field.id })}
+                >
+                  ×
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {!canAdd && <p className="mt-2 text-[11px] text-slate-500">Up to {MAX_PARTY_CUSTOM_FIELDS} custom fields.</p>}
+    </div>
+  );
+}
+
 export const PartySection = memo(function PartySection({
   party,
   invoice,
   dispatch,
 }: SectionProps & { party: PartyKey }) {
   const setParty =
-    (field: keyof Party): ChangeHandler =>
+    (field: PartyTextField): ChangeHandler =>
     (e) =>
       dispatch({ type: "SET_PARTY_FIELD", party, field, value: e.target.value });
   const isSender = party === "sender";
@@ -175,6 +260,7 @@ export const PartySection = memo(function PartySection({
           onChange={setParty("address")}
         />
       </FieldLabel>
+      <PartyCustomFields party={party} fields={invoice[party].customFields} dispatch={dispatch} />
     </>
   );
 });
@@ -183,61 +269,167 @@ export const PartySection = memo(function PartySection({
 // Line items
 // ---------------------------------------------------------------------------
 
-export const ItemsSection = memo(function ItemsSection({ invoice, dispatch }: SectionProps) {
+const columnLabel = (label: string, index: number) => label.trim() || `Column ${index + 1}`;
+
+/** Extra item columns the user names themselves (e.g. "HSN code", "Size", "Batch no."). */
+function CustomColumnsEditor({ invoice, dispatch }: SectionProps) {
+  const columns = invoice.customColumns;
+  const canAddColumn = columns.length < MAX_CUSTOM_COLUMNS;
+  return (
+    <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className={labelTextClass}>Extra columns</span>
+        <button
+          type="button"
+          disabled={!canAddColumn}
+          className={smallButtonClass}
+          onClick={() => dispatch({ type: "ADD_COLUMN" })}
+        >
+          + Add column
+        </button>
+      </div>
+      {columns.length === 0 ? (
+        <p className="mt-2 text-[11px] text-slate-500">
+          Add your own columns, like HSN code, size or batch number. They appear in the PDF table.
+        </p>
+      ) : (
+        <ul className="mt-2.5 flex flex-col gap-2">
+          {columns.map((col, index) => (
+            <li key={col.id} className="flex items-center gap-2">
+              <input
+                className={inputClass}
+                aria-label={`Name of extra column ${index + 1}`}
+                placeholder={`Column ${index + 1} name, e.g. HSN code`}
+                maxLength={30}
+                value={col.label}
+                onChange={(e) => dispatch({ type: "RENAME_COLUMN", id: col.id, label: e.target.value })}
+              />
+              <button
+                type="button"
+                aria-label={`Remove column ${columnLabel(col.label, index)}`}
+                className={removeButtonClass}
+                onClick={() => {
+                  const hasValues = invoice.items.some((item) => item.custom[col.id]?.trim());
+                  if (
+                    !hasValues ||
+                    window.confirm(`Remove "${columnLabel(col.label, index)}" and its values from all items?`)
+                  ) {
+                    dispatch({ type: "REMOVE_COLUMN", id: col.id });
+                  }
+                }}
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {!canAddColumn && (
+        <p className="mt-2 text-[11px] text-slate-500">
+          Up to {MAX_CUSTOM_COLUMNS} extra columns. Landscape gives them more room.
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface ItemRowProps {
+  item: InvoiceItem;
+  index: number;
+  columns: CustomColumn[];
+  currency: string;
+  canRemove: boolean;
+  dispatch: Dispatch<InvoiceAction>;
+}
+
+/** Memoised so typing in one item re-renders only that row, not the whole (up to 100-row) list. */
+const ItemRow = memo(function ItemRow({ item, index, columns, currency, canRemove, dispatch }: ItemRowProps) {
   const setItem =
-    (id: string, field: InvoiceItemField): ChangeHandler =>
+    (field: InvoiceItemField): ChangeHandler =>
     (e) =>
-      dispatch({ type: "UPDATE_ITEM", id, field, value: e.target.value });
+      dispatch({ type: "UPDATE_ITEM", id: item.id, field, value: e.target.value });
+  const setCustom =
+    (columnId: string): ChangeHandler =>
+    (e) =>
+      dispatch({ type: "SET_ITEM_CUSTOM", id: item.id, columnId, value: e.target.value });
+
+  return (
+    <div className="grid grid-cols-[1fr_1fr_36px] items-end gap-2.5 border-b border-slate-200 py-3.5 first:pt-0">
+      <Field
+        label={`Item ${index + 1}`}
+        placeholder="Description"
+        className="col-span-full"
+        value={item.description}
+        maxLength={300}
+        onChange={setItem("description")}
+      />
+      {columns.length > 0 && (
+        <div className="col-span-full grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+          {columns.map((col, colIndex) => (
+            <Field
+              key={col.id}
+              label={columnLabel(col.label, colIndex)}
+              className=""
+              maxLength={80}
+              value={item.custom[col.id]}
+              onChange={setCustom(col.id)}
+            />
+          ))}
+        </div>
+      )}
+      <Field
+        label="Qty"
+        type="number"
+        inputMode="decimal"
+        min="0"
+        step="any"
+        className=""
+        value={item.quantity}
+        onChange={setItem("quantity")}
+      />
+      <Field
+        label="Rate"
+        type="number"
+        inputMode="decimal"
+        min="0"
+        step="any"
+        className=""
+        value={item.rate}
+        onChange={setItem("rate")}
+      />
+      <button
+        type="button"
+        aria-label={`Remove item ${index + 1}`}
+        disabled={!canRemove}
+        className="h-10 w-9 rounded-lg border border-slate-200 bg-white text-xl text-slate-500 transition hover:border-red-600/25 hover:bg-red-100 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-white disabled:hover:text-slate-500"
+        onClick={() => dispatch({ type: "REMOVE_ITEM", id: item.id })}
+      >
+        ×
+      </button>
+      <p className="col-span-full -mt-1 text-right text-[11px] text-slate-500">
+        Amount: <strong className="text-ink">{formatMoney(lineAmount(item), currency)}</strong>
+      </p>
+    </div>
+  );
+});
+
+export const ItemsSection = memo(function ItemsSection({ invoice, dispatch }: SectionProps) {
   const canAddItem = invoice.items.length < MAX_ITEMS;
+  const canRemove = invoice.items.length > 1;
 
   return (
     <>
+      <CustomColumnsEditor invoice={invoice} dispatch={dispatch} />
       {invoice.items.map((item, index) => (
-        <div
-          className="grid grid-cols-[1fr_1fr_36px] items-end gap-2.5 border-b border-slate-200 py-3.5 first:pt-0"
+        <ItemRow
           key={item.id}
-        >
-          <Field
-            label={`Item ${index + 1}`}
-            placeholder="Description"
-            className="col-span-full"
-            value={item.description}
-            maxLength={300}
-            onChange={setItem(item.id, "description")}
-          />
-          <Field
-            label="Qty"
-            type="number"
-            inputMode="decimal"
-            min="0"
-            step="any"
-            className=""
-            value={item.quantity}
-            onChange={setItem(item.id, "quantity")}
-          />
-          <Field
-            label="Rate"
-            type="number"
-            inputMode="decimal"
-            min="0"
-            step="any"
-            className=""
-            value={item.rate}
-            onChange={setItem(item.id, "rate")}
-          />
-          <button
-            type="button"
-            aria-label={`Remove item ${index + 1}`}
-            disabled={invoice.items.length === 1}
-            className="h-10 w-9 rounded-lg border border-slate-200 bg-white text-xl text-slate-500 transition hover:border-red-600/25 hover:bg-red-100 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-white disabled:hover:text-slate-500"
-            onClick={() => dispatch({ type: "REMOVE_ITEM", id: item.id })}
-          >
-            ×
-          </button>
-          <p className="col-span-full -mt-1 text-right text-[11px] text-slate-500">
-            Amount: <strong className="text-ink">{formatMoney(lineAmount(item), invoice.currency)}</strong>
-          </p>
-        </div>
+          item={item}
+          index={index}
+          columns={invoice.customColumns}
+          currency={invoice.currency}
+          canRemove={canRemove}
+          dispatch={dispatch}
+        />
       ))}
       <button
         type="button"

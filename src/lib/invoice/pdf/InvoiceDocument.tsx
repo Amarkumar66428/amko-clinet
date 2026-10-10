@@ -1,5 +1,5 @@
 import { Document, Page, Text, View } from "@react-pdf/renderer";
-import type { Appearance, Invoice, TemplateId } from "../types";
+import type { Appearance, Invoice, Orientation, TemplateId } from "../types";
 import {
   ItemsTable,
   Label,
@@ -18,14 +18,15 @@ import { buildInvoiceView, type InvoiceView } from "./view";
 interface TemplateProps {
   view: InvoiceView;
   theme: PdfTheme;
+  orientation: Orientation;
 }
 
-function ModernTemplate({ view, theme }: TemplateProps) {
+function ModernTemplate({ view, theme, orientation }: TemplateProps) {
   return (
-    <Page size="A4" style={pageStyle(theme)}>
+    <Page size="A4" orientation={orientation} style={pageStyle(theme)}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
         <View>
-          <Logo src={view.logo} style={{ marginBottom: 12 }} />
+          <Logo src={view.logo} style={{ marginBottom: theme.gap(12) }} />
           <Label theme={theme} color={theme.accentText}>
             Invoice
           </Label>
@@ -39,7 +40,7 @@ function ModernTemplate({ view, theme }: TemplateProps) {
         </View>
       </View>
 
-      <View style={{ height: 2, backgroundColor: theme.accent, marginTop: 20, marginBottom: 26 }} />
+      <View style={{ height: 2, backgroundColor: theme.accent, marginTop: theme.gap(20), marginBottom: theme.gap(26) }} />
 
       <View style={{ flexDirection: "row", gap: 32 }}>
         <PartyBlock title="From" party={view.sender} theme={theme} titleColor={theme.accentText} />
@@ -54,28 +55,28 @@ function ModernTemplate({ view, theme }: TemplateProps) {
   );
 }
 
-function BoldTemplate({ view, theme }: TemplateProps) {
+function BoldTemplate({ view, theme, orientation }: TemplateProps) {
   return (
-    <Page size="A4" style={pageStyle(theme)}>
+    <Page size="A4" orientation={orientation} style={pageStyle(theme)}>
       {/* Negative margins bleed the band to the page edges while continuation pages keep normal padding. */}
       <View
         style={{
-          marginTop: -48,
-          marginHorizontal: -48,
+          marginTop: -theme.margin,
+          marginHorizontal: -theme.margin,
           backgroundColor: theme.accent,
           color: theme.onAccent,
-          paddingHorizontal: 48,
-          paddingTop: 40,
-          paddingBottom: 28,
+          paddingHorizontal: theme.margin,
+          paddingTop: theme.margin - 8,
+          paddingBottom: theme.gap(28),
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "flex-end",
         }}
       >
         <View>
-          <Logo src={view.logo} style={{ marginBottom: 14 }} />
+          <Logo src={view.logo} style={{ marginBottom: theme.gap(14) }} />
           <Text style={{ fontSize: theme.size * 3, fontWeight: 700, letterSpacing: 2, lineHeight: 1 }}>INVOICE</Text>
-          {view.sender.name ? <Text style={{ marginTop: 6, opacity: 0.85 }}>{view.sender.name}</Text> : null}
+          {view.sender.name ? <Text style={{ marginTop: theme.gap(6), opacity: 0.85 }}>{view.sender.name}</Text> : null}
         </View>
         <View style={{ textAlign: "right" }}>
           {view.number ? (
@@ -86,7 +87,7 @@ function BoldTemplate({ view, theme }: TemplateProps) {
         </View>
       </View>
 
-      <View style={{ flexDirection: "row", gap: 32, marginTop: 28 }}>
+      <View style={{ flexDirection: "row", gap: 32, marginTop: theme.gap(28) }}>
         <PartyBlock title="Billed to" party={view.client} theme={theme} titleColor={theme.accentText} />
         <PartyBlock title="From" party={view.sender} theme={theme} titleColor={theme.accentText} align="right" />
       </View>
@@ -99,26 +100,29 @@ function BoldTemplate({ view, theme }: TemplateProps) {
   );
 }
 
-function ClassicTemplate({ view, theme }: TemplateProps) {
+function ClassicTemplate({ view, theme, orientation }: TemplateProps) {
   const contact = [view.sender.email, view.sender.phone].filter(Boolean).join("  ·  ");
   return (
-    <Page size="A4" style={pageStyle(theme)}>
+    <Page size="A4" orientation={orientation} style={pageStyle(theme)}>
       <View style={{ alignItems: "center", textAlign: "center" }}>
-        <Logo src={view.logo} style={{ marginBottom: 10 }} />
+        <Logo src={view.logo} style={{ marginBottom: theme.gap(10) }} />
         {view.sender.name ? (
           <Text style={{ fontSize: theme.size * 2, fontWeight: 700, lineHeight: 1.25, color: theme.accentText }}>{view.sender.name}</Text>
         ) : null}
         {view.sender.address ? <Text style={{ color: theme.muted }}>{view.sender.address}</Text> : null}
         {contact ? <Text style={{ color: theme.muted }}>{contact}</Text> : null}
+        {view.sender.customLines.length ? (
+          <Text style={{ color: theme.muted }}>{view.sender.customLines.join("  ·  ")}</Text>
+        ) : null}
       </View>
 
-      <View style={{ marginTop: 18, borderTopWidth: 2, borderTopColor: theme.accent }} />
-      <View style={{ marginTop: 2, marginBottom: 24, borderTopWidth: 0.75, borderTopColor: theme.accent }} />
+      <View style={{ marginTop: theme.gap(18), borderTopWidth: 2, borderTopColor: theme.accent }} />
+      <View style={{ marginTop: 2, marginBottom: theme.gap(24), borderTopWidth: 0.75, borderTopColor: theme.accent }} />
 
       <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 32 }}>
         <PartyBlock title="Bill to" party={view.client} theme={theme} />
         <View style={{ width: 200 }}>
-          <Text style={{ fontSize: theme.size * 1.8, fontWeight: 700, lineHeight: 1.2, textAlign: "right", marginBottom: 8 }}>
+          <Text style={{ fontSize: theme.size * 1.8, fontWeight: 700, lineHeight: 1.2, textAlign: "right", marginBottom: theme.gap(8) }}>
             Invoice
           </Text>
           {[
@@ -128,7 +132,7 @@ function ClassicTemplate({ view, theme }: TemplateProps) {
           ]
             .filter(([, value]) => value)
             .map(([label, value]) => (
-              <View key={label} style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: 1.5 }}>
+              <View key={label} style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: theme.gap(1.5) }}>
                 <Text style={{ color: theme.muted }}>{label}</Text>
                 <Text style={{ fontWeight: 700 }}>{value}</Text>
               </View>
@@ -144,9 +148,9 @@ function ClassicTemplate({ view, theme }: TemplateProps) {
   );
 }
 
-function MinimalTemplate({ view, theme }: TemplateProps) {
+function MinimalTemplate({ view, theme, orientation }: TemplateProps) {
   return (
-    <Page size="A4" style={pageStyle(theme, { paddingTop: 56, paddingHorizontal: 56 })}>
+    <Page size="A4" orientation={orientation} style={pageStyle(theme)}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
         <View>
           <Text style={{ fontSize: theme.size * 1.6, fontWeight: 700, lineHeight: 1.25 }}>Invoice</Text>
@@ -155,12 +159,12 @@ function MinimalTemplate({ view, theme }: TemplateProps) {
         <Logo src={view.logo} height={36} />
       </View>
 
-      <View style={{ flexDirection: "row", gap: 24, marginTop: 36 }}>
+      <View style={{ flexDirection: "row", gap: 24, marginTop: theme.gap(36) }}>
         <PartyBlock title="From" party={view.sender} theme={theme} />
         <PartyBlock title="To" party={view.client} theme={theme} />
         <View style={{ width: 110 }}>
           <Label theme={theme}>Issued</Label>
-          <Text style={{ marginBottom: 8 }}>{view.issueDate || "—"}</Text>
+          <Text style={{ marginBottom: theme.gap(8) }}>{view.issueDate || "—"}</Text>
           {view.dueDate ? (
             <>
               <Label theme={theme}>Due</Label>
@@ -189,15 +193,17 @@ export interface InvoiceDocumentProps {
   templateId: TemplateId;
   invoice: Invoice;
   appearance: Appearance;
+  /** Defaults to portrait. */
+  orientation?: Orientation;
 }
 
-export function InvoiceDocument({ templateId, invoice, appearance }: InvoiceDocumentProps) {
+export function InvoiceDocument({ templateId, invoice, appearance, orientation = "portrait" }: InvoiceDocumentProps) {
   const view = buildInvoiceView(invoice);
   const Template = TEMPLATE_COMPONENTS[templateId];
   const title = view.number ? `Invoice ${view.number}` : "Invoice";
   return (
-    <Document title={title} author={view.sender.name || undefined} creator="AMKO" producer="AMKO" language="en">
-      <Template view={view} theme={createPdfTheme(appearance)} />
+    <Document title={title} author={view.sender.name || undefined} creator="amk" producer="amk" language="en">
+      <Template view={view} theme={createPdfTheme(appearance)} orientation={orientation} />
     </Document>
   );
 }

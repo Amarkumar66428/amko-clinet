@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Dashboard | AMKO" };
+export const metadata: Metadata = { title: "Dashboard | amk" };
 
 export default function DashboardPage() {
   return (

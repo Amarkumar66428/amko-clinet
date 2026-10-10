@@ -19,6 +19,7 @@ export function logout(): void {
   localStorage.clear();
   clearToken();
   // Full reload on purpose: drops all in-memory client state after the session ends.
+  // The server route also clears the httpOnly cookie set by Google sign-in, then redirects to /auth/signin.
   // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-  window.location.href = "/auth/signin";
+  window.location.href = "/api/auth/logout";
 }

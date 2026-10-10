@@ -22,6 +22,12 @@ export interface PdfTheme {
   accentSoft: string;
   /** Readable text colour on top of `accent`. */
   onAccent: string;
+  /** Body line height as a multiple of `size`. */
+  lineHeight: number;
+  /** Page margin in pt. */
+  margin: number;
+  /** Scales a template's base gap (in pt) by the user's spacing setting. */
+  gap: (points: number) => number;
 }
 
 const hexToRgb = (hex: string) => [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16));
@@ -60,17 +66,20 @@ export function createPdfTheme(appearance: Appearance): PdfTheme {
     accentText: readableOnWhite(appearance.accentColor),
     accentSoft: tint(appearance.accentColor, 0.92),
     onAccent: luminance(appearance.accentColor) > 0.45 ? "#111827" : "#ffffff",
+    lineHeight: appearance.lineHeight,
+    margin: appearance.margin,
+    gap: (points) => Math.round(points * appearance.spacing * 10) / 10,
   };
 }
 
-export const pageStyle = (theme: PdfTheme, overrides: Style = {}): Style => ({
+export const pageStyle = (theme: PdfTheme): Style => ({
   fontFamily: theme.font,
   fontSize: theme.size,
   color: theme.text,
-  paddingTop: 48,
-  paddingHorizontal: 48,
-  paddingBottom: 64,
-  ...overrides,
+  paddingTop: theme.margin,
+  paddingHorizontal: theme.margin,
+  // Extra room at the bottom for the page footer.
+  paddingBottom: theme.margin + 16,
 });
 
 /**
@@ -78,7 +87,7 @@ export const pageStyle = (theme: PdfTheme, overrides: Style = {}): Style => ({
  * against a default 18pt unless fontSize is set on the same element, and a lineHeight on <Page>
  * hides `render` text such as page numbers.
  */
-const bodyLineHeight = (theme: PdfTheme) => `${theme.size * 1.4}pt`;
+const bodyLineHeight = (theme: PdfTheme) => `${theme.size * theme.lineHeight}pt`;
 
 // ---------------------------------------------------------------------------
 // Primitives
@@ -93,7 +102,7 @@ export function Label({ children, color, theme }: { children: ReactNode; color?:
         letterSpacing: 0.8,
         textTransform: "uppercase",
         color: color ?? theme.muted,
-        marginBottom: 4,
+        marginBottom: theme.gap(4),
       }}
     >
       {children}
@@ -121,14 +130,16 @@ export function PartyBlock({
   titleColor?: string;
   align?: "left" | "right";
 }) {
-  const lines = [party.address, party.email, party.phone].filter(Boolean);
+  const lines = [party.address, party.email, party.phone, ...party.customLines].filter(Boolean);
   return (
     <View style={{ flex: 1, textAlign: align }}>
       <Label theme={theme} color={titleColor}>
         {title}
       </Label>
       {party.name ? (
-        <Text style={{ fontSize: theme.size * 1.2, fontWeight: 700, lineHeight: 1.3, marginBottom: 2 }}>{party.name}</Text>
+        <Text style={{ fontSize: theme.size * 1.2, fontWeight: 700, lineHeight: 1.3, marginBottom: theme.gap(2) }}>
+          {party.name}
+        </Text>
       ) : null}
       {lines.map((line, i) => (
         <Text key={i} style={{ color: theme.muted, lineHeight: bodyLineHeight(theme) }}>
@@ -153,7 +164,7 @@ export function MetaItem({
 }) {
   if (!value) return null;
   return (
-    <View style={{ textAlign: align, marginBottom: 6 }}>
+    <View style={{ textAlign: align, marginBottom: theme.gap(6) }}>
       <Text style={{ fontSize: theme.size * 0.8, color: theme.muted }}>{label}</Text>
       <Text style={{ fontWeight: 700 }}>{value}</Text>
     </View>
@@ -166,16 +177,32 @@ export function MetaItem({
 
 export type TableVariant = "filled" | "lined" | "boxed";
 
-const COLUMNS = [
-  { key: "description", label: "Description", style: { flex: 1 } },
-  { key: "quantity", label: "Qty", style: { width: 44, textAlign: "right" } },
-  { key: "rate", label: "Rate", style: { width: 96, textAlign: "right" } },
-  { key: "amount", label: "Amount", style: { width: 104, textAlign: "right" } },
-] as const satisfies { key: string; label: string; style: Style }[];
+interface Column {
+  label: string;
+  style: Style;
+  value: (item: InvoiceView["items"][number]) => string;
+}
+
+const FIXED_COLUMNS = {
+  description: { label: "Description", style: { flex: 1.6 }, value: (item) => item.description },
+  quantity: { label: "Qty", style: { width: 44, textAlign: "right" }, value: (item) => item.quantity },
+  rate: { label: "Rate", style: { width: 96, textAlign: "right" }, value: (item) => item.rate },
+  amount: { label: "Amount", style: { width: 104, textAlign: "right" }, value: (item) => item.amount },
+} satisfies Record<string, Column>;
+
+/** Custom columns sit between Description and Qty and share the flexible width with Description. */
+function tableColumns(view: InvoiceView): Column[] {
+  const custom = view.columns.map(
+    (label, index): Column => ({ label, style: { flex: 1 }, value: (item) => item.custom[index] }),
+  );
+  const { description, quantity, rate, amount } = FIXED_COLUMNS;
+  return [description, ...custom, quantity, rate, amount];
+}
 
 export function ItemsTable({ view, theme, variant }: { view: InvoiceView; theme: PdfTheme; variant: TableVariant }) {
-  const cellPad = { paddingVertical: 7, paddingHorizontal: 8, lineHeight: bodyLineHeight(theme) };
+  const cellPad = { paddingVertical: theme.gap(7), paddingHorizontal: 8, lineHeight: bodyLineHeight(theme) };
   const boxed = variant === "boxed";
+  const columns = tableColumns(view);
 
   const headerRow: Style = {
     flexDirection: "row",
@@ -198,11 +225,11 @@ export function ItemsTable({ view, theme, variant }: { view: InvoiceView; theme:
     boxed && index > 0 ? { borderLeftWidth: 1, borderLeftColor: theme.line } : {};
 
   return (
-    <View style={{ marginTop: 24 }}>
+    <View style={{ marginTop: theme.gap(24) }}>
       {/* `fixed` repeats the header on every page when the table spans pages. */}
       <View style={headerRow} fixed>
-        {COLUMNS.map((col, i) => (
-          <Text key={col.key} style={[cellPad, col.style, headerText, divider(i)]}>
+        {columns.map((col, i) => (
+          <Text key={i} style={[cellPad, col.style, headerText, divider(i)]}>
             {col.label}
           </Text>
         ))}
@@ -214,9 +241,9 @@ export function ItemsTable({ view, theme, variant }: { view: InvoiceView; theme:
       ) : (
         view.items.map((item) => (
           <View key={item.id} style={bodyRow} wrap={false}>
-            {COLUMNS.map((col, i) => (
-              <Text key={col.key} style={[cellPad, col.style, divider(i)]}>
-                {item[col.key]}
+            {columns.map((col, i) => (
+              <Text key={i} style={[cellPad, col.style, divider(i)]}>
+                {col.value(item)}
               </Text>
             ))}
           </View>
@@ -239,13 +266,13 @@ export function TotalsBlock({ view, theme, variant }: { view: InvoiceView; theme
     view.discount && { label: "Discount", value: view.discount },
   ].filter((row): row is { label: string; value: string } => Boolean(row));
 
-  const row: Style = { flexDirection: "row", justifyContent: "space-between", paddingVertical: 3 };
+  const row: Style = { flexDirection: "row", justifyContent: "space-between", paddingVertical: theme.gap(3) };
 
   const totalRow: Style = {
     ...row,
     alignItems: "center",
-    marginTop: 8,
-    paddingVertical: 8,
+    marginTop: theme.gap(8),
+    paddingVertical: theme.gap(8),
     ...(variant === "rule" && { borderTopWidth: 1.5, borderTopColor: theme.accent }),
     ...(variant === "band" && { backgroundColor: theme.accent, color: theme.onAccent, paddingHorizontal: 10, borderRadius: 3 }),
     ...(variant === "double" && { borderTopWidth: 0.75, borderBottomWidth: 2.5, borderColor: theme.text }),
@@ -253,7 +280,7 @@ export function TotalsBlock({ view, theme, variant }: { view: InvoiceView; theme
   const totalColor = variant === "rule" ? theme.accentText : undefined;
 
   return (
-    <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 20 }} wrap={false}>
+    <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: theme.gap(20) }} wrap={false}>
       <View style={{ width: 230 }}>
         {rows.map((r) => (
           <View key={r.label} style={[row, { paddingHorizontal: variant === "band" ? 10 : 0 }]}>
@@ -277,8 +304,11 @@ export function TotalsBlock({ view, theme, variant }: { view: InvoiceView; theme
 export function NotesBlock({ notes, theme, title = "Notes" }: { notes: string; theme: PdfTheme; title?: string }) {
   if (!notes) return null;
   return (
-    <View style={{ marginTop: 28, paddingTop: 14, borderTopWidth: 0.75, borderTopColor: theme.line }} wrap={false}>
-      <Text style={{ fontWeight: 700, marginBottom: 4 }}>{title}</Text>
+    <View
+      style={{ marginTop: theme.gap(28), paddingTop: theme.gap(14), borderTopWidth: 0.75, borderTopColor: theme.line }}
+      wrap={false}
+    >
+      <Text style={{ fontWeight: 700, marginBottom: theme.gap(4) }}>{title}</Text>
       <Text style={{ color: theme.muted, lineHeight: bodyLineHeight(theme) }}>{notes}</Text>
     </View>
   );
@@ -289,9 +319,9 @@ export function PageFooter({ theme, text }: { theme: PdfTheme; text?: string }) 
   // Both `left` and `right` are set so the dynamic text gets a width to lay out in.
   const footer: Style = {
     position: "absolute",
-    bottom: 28,
-    left: 48,
-    right: 48,
+    bottom: Math.round(theme.margin * 0.6),
+    left: theme.margin,
+    right: theme.margin,
     fontSize: theme.size * 0.75,
     color: theme.muted,
   };

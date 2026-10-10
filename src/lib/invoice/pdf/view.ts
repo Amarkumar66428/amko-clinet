@@ -2,7 +2,13 @@ import { formatDate, formatMoney, formatQuantity, toNumber } from "../format";
 import { calculateTotals, lineAmount } from "../state";
 import type { Invoice, Party } from "../types";
 
-export interface PartyView extends Party {
+export interface PartyView {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  /** Custom fields with a value, ready to print as "Label: value". */
+  customLines: string[];
   isEmpty: boolean;
 }
 
@@ -12,6 +18,8 @@ export interface LineView {
   quantity: string;
   rate: string;
   amount: string;
+  /** Custom column values, in the same order as `InvoiceView.columns`. */
+  custom: string[];
 }
 
 /** Everything a template renders, pre-formatted so templates contain layout only. */
@@ -22,6 +30,8 @@ export interface InvoiceView {
   sender: PartyView;
   client: PartyView;
   logo: string | null;
+  /** Header labels of the custom columns shown between Description and Qty. */
+  columns: string[];
   items: LineView[];
   subtotal: string;
   tax: { label: string; amount: string } | null;
@@ -37,7 +47,14 @@ const trimParty = (party: Party): PartyView => {
     phone: party.phone.trim(),
     address: party.address.trim(),
   };
-  return { ...trimmed, isEmpty: !Object.values(trimmed).some(Boolean) };
+  const customLines = party.customFields
+    .filter((field) => field.value.trim())
+    .map((field) => (field.label.trim() ? `${field.label.trim()}: ${field.value.trim()}` : field.value.trim()));
+  return {
+    ...trimmed,
+    customLines,
+    isEmpty: !Object.values(trimmed).some(Boolean) && customLines.length === 0,
+  };
 };
 
 export function buildInvoiceView(invoice: Invoice): InvoiceView {
@@ -45,15 +62,18 @@ export function buildInvoiceView(invoice: Invoice): InvoiceView {
   const totals = calculateTotals(invoice);
   const taxRate = toNumber(invoice.taxRate);
 
+  const columnIds = invoice.customColumns.map((col) => col.id);
   const items = invoice.items
+    .map((item) => ({ item, custom: columnIds.map((id) => item.custom[id]?.trim() ?? "") }))
     // Blank rows are editor scaffolding, not invoice lines.
-    .filter((item) => item.description.trim() || lineAmount(item) !== 0)
-    .map((item) => ({
+    .filter(({ item, custom }) => item.description.trim() || lineAmount(item) !== 0 || custom.some(Boolean))
+    .map(({ item, custom }) => ({
       id: item.id,
       description: item.description.trim(),
       quantity: formatQuantity(toNumber(item.quantity)),
       rate: money(toNumber(item.rate)),
       amount: money(lineAmount(item)),
+      custom,
     }));
 
   return {
@@ -63,6 +83,7 @@ export function buildInvoiceView(invoice: Invoice): InvoiceView {
     sender: trimParty(invoice.sender),
     client: trimParty(invoice.client),
     logo: invoice.logo,
+    columns: invoice.customColumns.map((col, i) => col.label.trim() || `Column ${i + 1}`),
     items,
     subtotal: money(totals.subtotal),
     tax: totals.taxAmount

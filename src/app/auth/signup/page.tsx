@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, CircularProgress, TextField } from "@mui/material";
 import AuthShell, { FormField, submitSx, textFieldSx } from "@/components/AuthShell";
-import authService, { type SignUpPayload } from "@/lib/authService";
+import authService, { EMAIL_RULE, PASSWORD_RULE, type SignUpPayload } from "@/lib/authService";
 import { notify } from "@/lib/notify";
 import type { ApiError } from "@/lib/api";
 
@@ -14,8 +14,6 @@ const FIELDS: { label: string; field: keyof SignUpPayload; placeholder: string; 
   { label: "Email", field: "email", placeholder: "demo@example.com" },
   { label: "Password", field: "password", placeholder: "********", type: "password" },
 ];
-
-const PASSWORD_RULE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,6 +26,10 @@ export default function SignupPage() {
       notify("Please fill all the fields", "error");
       return;
     }
+    if (!EMAIL_RULE.test(form.email.trim())) {
+      notify("Please enter a valid email address", "error");
+      return;
+    }
     if (!PASSWORD_RULE.test(form.password)) {
       notify(
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
@@ -38,10 +40,10 @@ export default function SignupPage() {
 
     try {
       setIsLoading(true);
-      if (await authService.signUp(form)) {
-        notify("Signup successful", "success");
-        router.push("/auth/signin");
-      }
+      // Registration also signs the user in, so go straight to the dashboard.
+      await authService.signUp(form);
+      notify("Signup successful", "success");
+      router.push("/user/dashboard");
     } catch (error) {
       notify((error as ApiError)?.message || "Signup failed", "error");
     } finally {

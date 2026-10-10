@@ -1,6 +1,6 @@
-# 🐝 amko – Frontend
+# 🐝 amk – Frontend
 
-Welcome to **amko**, an invite-only SaaS eCommerce platform where entrepreneurs can launch, manage, and grow their online stores with powerful tools including AI features, affiliate systems, tiered memberships, and custom marketing.
+Welcome to **amk**, an invite-only SaaS eCommerce platform where entrepreneurs can launch, manage, and grow their online stores with powerful tools including AI features, affiliate systems, tiered memberships, and custom marketing.
 
 ---
 
@@ -26,6 +26,31 @@ The invoice builder (`/invoice/templates`, `/invoice/editor/[templateId]`) runs 
 - Drafts are kept in `localStorage`; templates live in `src/lib/invoice/pdf/InvoiceDocument.tsx` and are registered in `src/lib/invoice/templates.ts`.
 
 Set `NEXT_PUBLIC_API_BASE_URL` (the old `VITE_API_BASE_URL` is still accepted) in `.env`.
+
+### Sign-in (email/password and Google)
+
+Email/password registration and login, and "Continue with Google", are handled by this app's own route handlers (`src/app/api/auth/*`), not the external API. Users are stored in the MongoDB `users` collection (unique by email; passwords hashed with scrypt; a verified Google email is linked to an existing password account), and the session is a signed JWT kept in the httpOnly `access_token` cookie.
+
+1. In Google Cloud Console → APIs & Services → Credentials, create an **OAuth client ID** (type: Web application).
+2. Add an authorised redirect URI for each origin: `http://localhost:3000/api/auth/google/callback` and `https://<your-domain>/api/auth/google/callback`.
+3. Set these in `.env.local` (and in Vercel project settings):
+
+```bash
+GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=xxxx
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net
+MONGODB_DB=amk                     # optional, defaults to "amk"
+AUTH_SECRET=<random 32+ chars>      # e.g. `openssl rand -base64 32`
+```
+
+| Route | Purpose |
+| --- | --- |
+| `POST /api/auth/register` | `{ firstName, lastName, email, password }` → creates the user and signs them in (409 if the email exists) |
+| `POST /api/auth/login` | `{ email, password }` → sets the session cookie (401 on bad credentials) |
+| `GET /api/auth/google` | Redirects to Google (state + nonce + PKCE) |
+| `GET /api/auth/google/callback` | Verifies the ID token, upserts the user, sets the session cookie |
+| `GET /api/auth/me` | Returns the signed-in user |
+| `GET /api/auth/logout` | Clears the session cookie |
 
 | Path | Purpose |
 | --- | --- |

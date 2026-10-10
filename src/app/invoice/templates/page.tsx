@@ -3,7 +3,7 @@ import TemplateGallery from "@/components/invoice/TemplateGallery";
 import { INVOICE_TEMPLATES } from "@/lib/invoice/templates";
 
 export const metadata: Metadata = {
-  title: "Free Invoice Templates | AMKO",
+  title: "Free Invoice Templates | amk",
   description: "Pick a professional invoice template, fill in your details and download a print-ready PDF.",
 };
 

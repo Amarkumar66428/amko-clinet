@@ -32,9 +32,11 @@ import {
   Code as CodeIcon,
   Speed as SpeedIcon,
   ArrowForward as ArrowForwardIcon,
+  SvgIconComponent,
 } from "@mui/icons-material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const NAV_ITEMS = [
   "Home",
@@ -73,12 +75,18 @@ export default function HomePage() {
             sx={{ justifyContent: "space-between", py: 1 }}
           >
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Image src="/amko.png" alt="AMKO Logo" width={35} height={35} className="size-[35px]" />
+              <Image
+                src="/amk.png"
+                alt="amk Logo"
+                width={35}
+                height={35}
+                className="size-[35px]"
+              />
               <Typography
                 variant="h6"
                 sx={{ fontWeight: 800, letterSpacing: -0.5 }}
               >
-                AMKO
+                amk
               </Typography>
             </Stack>
 
@@ -114,7 +122,7 @@ export default function HomePage() {
                 Login
               </Button>
               <Button
-                onClick={() => router.push("/amko/builder")}
+                onClick={() => router.push("/amk/builder")}
                 variant="contained"
                 sx={{
                   textTransform: "none",
@@ -322,117 +330,40 @@ export default function HomePage() {
             <Grid size={{ xs: 12, md: 7 }}>
               <Grid container spacing={2.5}>
                 {/* Highlighted Card (Dark) */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Card
-                    sx={{
-                      bgcolor: "#0b1329",
-                      color: "#ffffff",
-                      borderRadius: "12px",
-                      height: "100%",
-                    }}
-                  >
-                    <CardContent sx={{ p: 3 }}>
-                      <WebIcon
-                        sx={{ fontSize: 32, mb: 1.5, color: "#38bdf8" }}
-                      />
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                        No-Code Web Builder
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "#94a3b8", lineHeight: 1.6 }}
-                      >
-                        Drag-and-drop live components with instant responsive
-                        previews and zero server setup.
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                {/* Light Card 1 */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Card
-                    sx={{
-                      bgcolor: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "12px",
-                      height: "100%",
-                    }}
-                  >
-                    <CardContent sx={{ p: 3 }}>
-                      <CodeIcon
-                        sx={{ fontSize: 32, mb: 1.5, color: "#0f172a" }}
-                      />
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                        LaTeX Resume Engine
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "#64748b", lineHeight: 1.6 }}
-                      >
-                        Generate ATS-proof PDF resumes using real-time LaTeX
-                        compilation or visual form editors.
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                {/* Light Card 2 */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Card
-                    onClick={() => router.push("/invoice/templates")}
-                    sx={{
-                      bgcolor: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "12px",
-                      height: "100%",
-                    }}
-                  >
-                    <CardContent sx={{ p: 3 }}>
-                      <ReceiptIcon
-                        sx={{ fontSize: 32, mb: 1.5, color: "#0f172a" }}
-                      />
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                        Smart Bill Maker
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "#64748b", lineHeight: 1.6 }}
-                      >
-                        Professional invoice templates with automatic tax
-                        computation and client tracking.
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                {/* Light Card 3 */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Card
-                    sx={{
-                      bgcolor: "#ffffff",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "12px",
-                      height: "100%",
-                    }}
-                  >
-                    <CardContent sx={{ p: 3 }}>
-                      <SpeedIcon
-                        sx={{ fontSize: 32, mb: 1.5, color: "#0f172a" }}
-                      />
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                        1-Click Deployment
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "#64748b", lineHeight: 1.6 }}
-                      >
-                        Publish your custom store or portfolio to your custom
-                        domain or our lightning CDN.
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                {[
+                  {
+                    title: "No-Code Web Builder",
+                    subtitle:
+                      "Drag-and-drop live components with instant responsive previews and zero server setup.",
+                    icon: WebIcon,
+                    path: "/",
+                  },
+                  {
+                    title: "LaTeX Resume Engine",
+                    subtitle:
+                      "Generate ATS-proof resumes using real-time LaTeX compilation or visual form editors.",
+                    icon: CodeIcon,
+                    path: "/",
+                  },
+                  {
+                    title: "Smart Bill Maker",
+                    subtitle:
+                      "Professional invoice templates with automatic tax computation and client tracking.",
+                    icon: ReceiptIcon,
+                    path: "/invoice/templates",
+                  },
+                  {
+                    title: "1-Click Deployment",
+                    subtitle:
+                      "Publish your custom store or portfolio to your custom domain or our lightning CDN.",
+                    icon: SpeedIcon,
+                    path: "/",
+                  },
+                ].map((item, index) => (
+                  <Grid key={item.title} size={{ xs: 12, sm: 6 }}>
+                    <ToolCard item={item} router={router} index={index++} />
+                  </Grid>
+                ))}
               </Grid>
             </Grid>
           </Grid>
@@ -672,8 +603,9 @@ export default function HomePage() {
                   variant="body2"
                   sx={{ color: "#475569", lineHeight: 1.6 }}
                 >
-                  &ldquo;The LaTeX resume generator is unbeatable. I updated my resume
-                  in 10 minutes and landed interviews at top tech firms.&rdquo;
+                  &ldquo;The LaTeX resume generator is unbeatable. I updated my
+                  resume in 10 minutes and landed interviews at top tech
+                  firms.&rdquo;
                 </Typography>
               </Card>
             </Grid>
@@ -712,9 +644,9 @@ export default function HomePage() {
                   variant="body2"
                   sx={{ color: "#cbd5e1", lineHeight: 1.6 }}
                 >
-                  &ldquo;Having the site builder and the invoice generator under one
-                  roof saved me hundreds of dollars in SaaS subscriptions each
-                  month.&rdquo;
+                  &ldquo;Having the site builder and the invoice generator under
+                  one roof saved me hundreds of dollars in SaaS subscriptions
+                  each month.&rdquo;
                 </Typography>
               </Card>
             </Grid>
@@ -749,8 +681,8 @@ export default function HomePage() {
                   variant="body2"
                   sx={{ color: "#475569", lineHeight: 1.6 }}
                 >
-                  &ldquo;The website builder was so easy to customize. We had our
-                  store up and receiving payments on day one without writing
+                  &ldquo;The website builder was so easy to customize. We had
+                  our store up and receiving payments on day one without writing
                   backend code.&rdquo;
                 </Typography>
               </Card>
@@ -1106,9 +1038,15 @@ export default function HomePage() {
                 alignItems="center"
                 sx={{ mb: 2 }}
               >
-                <Image src="/amko.png" alt="AMKO Logo" width={35} height={35} className="size-[35px]" />
+                <Image
+                  src="/amk.png"
+                  alt="amk Logo"
+                  width={35}
+                  height={35}
+                  className="size-[35px]"
+                />
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                  AMKO
+                  amk
                 </Typography>
               </Stack>
               <Typography
@@ -1200,7 +1138,7 @@ export default function HomePage() {
                 Contact
               </Typography>
               <Typography variant="body2" sx={{ color: "#64748b", mb: 1 }}>
-                support@AMKO.io
+                support@amk.io
               </Typography>
               <Typography variant="body2" sx={{ color: "#64748b" }}>
                 +1 (555) 019-2834
@@ -1214,10 +1152,64 @@ export default function HomePage() {
             variant="caption"
             sx={{ color: "#94a3b8", display: "block", textAlign: "center" }}
           >
-            © {new Date().getFullYear()} AMKO Inc. All rights reserved.
+            © {new Date().getFullYear()} amk Inc. All rights reserved.
           </Typography>
         </Container>
       </Box>
     </Box>
   );
 }
+
+interface Tool {
+  title: string;
+  subtitle: string;
+  icon: SvgIconComponent;
+}
+
+interface ToolCardProps {
+  item: Tool;
+  router: AppRouterInstance;
+  index: number;
+}
+
+const ToolCard = ({ item, router, index }: ToolCardProps) => {
+  const Icon = item.icon;
+  const isEven = index % 2 === 0;
+
+  return (
+    <Card
+      onClick={() => router.push("/invoice/templates")}
+      sx={{
+        bgcolor: isEven ? "#ffffff" : "#0b1329",
+        color: isEven ? "#0b1329" : "#ffffff",
+        borderRadius: "12px",
+        height: "100%",
+        cursor: "pointer",
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Icon
+          sx={{
+            fontSize: 32,
+            mb: 1.5,
+            color: isEven ? "#0b1329" : "#38bdf8",
+          }}
+        />
+
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+          {item.title}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          sx={{
+            color: isEven ? "#0b1329" : "#94a3b8",
+            lineHeight: 1.6,
+          }}
+        >
+          {item.subtitle}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+};

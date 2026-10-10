@@ -6,7 +6,6 @@ import { Box, Button, CircularProgress, IconButton, InputAdornment, TextField } 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AuthShell, { FormField, submitSx, textFieldSx } from "@/components/AuthShell";
 import authService from "@/lib/authService";
-import { setToken } from "@/lib/auth";
 import { notify } from "@/lib/notify";
 import type { ApiError } from "@/lib/api";
 
@@ -25,9 +24,7 @@ export default function SigninPage() {
 
     try {
       setIsLoading(true);
-      const response = await authService.signIn(form);
-      if (!response?.data?.token) return;
-      setToken(response.data.token);
+      await authService.signIn(form);
       notify("Login successful", "success");
       router.push("/user/dashboard");
     } catch (error) {

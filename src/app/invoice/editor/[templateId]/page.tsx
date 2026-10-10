@@ -16,7 +16,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: EditorPageProps): Promise<Metadata> {
   const template = getInvoiceTemplate((await params).templateId);
-  return { title: template ? `${template.name} Invoice Editor | AMKO` : "Invoice Editor | AMKO" };
+  return { title: template ? `${template.name} Invoice Editor | amk` : "Invoice Editor | amk" };
 }
 
 export default async function InvoiceEditorPage({ params }: EditorPageProps) {

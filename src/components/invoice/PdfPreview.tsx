@@ -6,6 +6,9 @@ type PdfJs = typeof import("pdfjs-dist");
 
 let pdfjsPromise: Promise<PdfJs> | null = null;
 
+/** Wait for resizing (e.g. the side panel opening) to settle before re-rasterising every page. */
+const RESIZE_SETTLE_MS = 150;
+
 /** Loads pdf.js once and points it at a single shared module worker. */
 function loadPdfJs(): Promise<PdfJs> {
   pdfjsPromise ??= import("pdfjs-dist").then((pdfjs) => {
@@ -42,15 +45,31 @@ export default function PdfPreview({ pdf, onError }: PdfPreviewProps) {
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return;
-    const observer = new ResizeObserver(([entry]) => setWidth(Math.floor(entry.contentRect.width)));
+    let timer: number | undefined;
+    let measured = false;
+    const observer = new ResizeObserver(([entry]) => {
+      const next = Math.floor(entry.contentRect.width);
+      window.clearTimeout(timer);
+      // The first measurement applies at once; later ones wait until resizing stops.
+      if (!measured) {
+        measured = true;
+        setWidth(next);
+      } else {
+        timer = window.setTimeout(() => setWidth(next), RESIZE_SETTLE_MS);
+      }
+    });
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
     if (!pdf || !width) return;
     let cancelled = false;
     let destroy: (() => Promise<void>) | undefined;
+    let cancelPage: (() => void) | undefined;
 
     (async () => {
       const pdfjs = await loadPdfJs();
@@ -75,19 +94,23 @@ export default function PdfPreview({ pdf, onError }: PdfPreviewProps) {
         canvas.setAttribute("role", "img");
         canvas.setAttribute("aria-label", `Invoice preview, page ${pageNumber} of ${doc.numPages}`);
 
-        await page.render({ canvas, viewport }).promise;
+        const renderTask = page.render({ canvas, viewport });
+        cancelPage = () => renderTask.cancel();
+        await renderTask.promise;
         canvases.push(canvas);
       }
 
       if (!cancelled) pagesRef.current?.replaceChildren(...canvases);
     })()
       .catch((error: unknown) => {
+        // Cancelling a superseded render rejects it; that isn't a failure.
         if (!cancelled) onErrorRef.current?.(error);
       })
       .finally(() => void destroy?.());
 
     return () => {
       cancelled = true;
+      cancelPage?.();
     };
   }, [pdf, width]);
 

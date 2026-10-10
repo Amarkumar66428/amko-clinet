@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, CircularProgress, IconButton, InputAdornment, TextField } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -8,6 +8,7 @@ import AuthShell, { FormField, submitSx, textFieldSx } from "@/components/AuthSh
 import authService from "@/lib/authService";
 import { setToken } from "@/lib/auth";
 import { notify } from "@/lib/notify";
+import type { ApiError } from "@/lib/api";
 
 export default function SigninPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function SigninPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
 
-  const handleSignIn = async (e) => {
+  const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.email || !form.password) {
       notify("Please fill all the fields", "error");
@@ -30,7 +31,7 @@ export default function SigninPage() {
       notify("Login successful", "success");
       router.push("/user/dashboard");
     } catch (error) {
-      notify(error?.message || "Login failed", "error");
+      notify((error as ApiError)?.message || "Login failed", "error");
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +39,7 @@ export default function SigninPage() {
 
   return (
     <AuthShell title="Sign In" footerText="Don’t have an account?" footerLink="/auth/signup" footerLabel="Sign Up">
-      <form style={{ width: "100%" }} onSubmit={handleSignIn}>
+      <form className="w-full" onSubmit={handleSignIn}>
         <Box display="flex" flexDirection="column" gap={3}>
           <FormField label="Email">
             <TextField

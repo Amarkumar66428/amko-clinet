@@ -1,18 +1,22 @@
 import { useSyncExternalStore } from "react";
 
+type Updater<T> = T | ((prev: T) => T);
+
 // Minimal global store usable outside React (e.g. from the API client).
-export function createStore(initialState) {
+export function createStore<T>(initialState: T) {
   let state = initialState;
-  const listeners = new Set();
+  const listeners = new Set<() => void>();
 
   const get = () => state;
-  const set = (next) => {
-    state = typeof next === "function" ? next(state) : next;
+  const set = (next: Updater<T>) => {
+    state = typeof next === "function" ? (next as (prev: T) => T)(state) : next;
     listeners.forEach((listener) => listener());
   };
-  const subscribe = (listener) => {
+  const subscribe = (listener: () => void) => {
     listeners.add(listener);
-    return () => listeners.delete(listener);
+    return () => {
+      listeners.delete(listener);
+    };
   };
   const useStore = () => useSyncExternalStore(subscribe, get, () => initialState);
 

@@ -1,7 +1,8 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Button, Divider, Typography, type SxProps, type Theme } from "@mui/material";
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
@@ -12,9 +13,19 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export const textFieldSx = {
+const liftOnHover = {
+  transition: "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
+  "&:hover": { transform: "translateY(-1px)" },
+};
+
+export const textFieldSx: SxProps<Theme> = {
   "& .MuiOutlinedInput-root": {
-    borderRadius: "8px",
+    minHeight: 48,
+    borderRadius: "10px",
+    background: "rgba(255, 255, 255, 0.85)",
+    transition: "border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease",
+    "&:hover": { background: "#ffffff" },
+    "&.Mui-focused": { background: "#ffffff", boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" },
     "& fieldset": { borderColor: "#ccc" },
     "&:hover fieldset": { borderColor: "#999" },
     "&.Mui-focused fieldset": { borderColor: "#666" },
@@ -22,39 +33,56 @@ export const textFieldSx = {
   },
 };
 
-export const submitSx = {
+export const submitSx: SxProps<Theme> = {
+  ...liftOnHover,
   textTransform: "none",
-  borderRadius: 2,
+  minHeight: 48,
+  borderRadius: "10px",
   fontWeight: 500,
   px: 2,
   py: 1.2,
   fontSize: "1rem",
   color: "#fff",
-  "&:hover": { opacity: 0.9 },
+  background: "linear-gradient(135deg, #2563eb, #4f46e5)",
+  boxShadow: "0 8px 18px rgba(37, 99, 235, 0.22)",
+  "&:hover": {
+    transform: "translateY(-1px)",
+    opacity: 0.9,
+    background: "linear-gradient(135deg, #1d4ed8, #4338ca)",
+    boxShadow: "0 10px 22px rgba(37, 99, 235, 0.28)",
+  },
   "&:disabled": { color: "#fff" },
 };
 
-export default function AuthShell({ title, footerText, footerLink, footerLabel, children }) {
+interface AuthShellProps {
+  title: string;
+  footerText: string;
+  footerLink: string;
+  footerLabel: string;
+  children: ReactNode;
+}
+
+export default function AuthShell({ title, footerText, footerLink, footerLabel, children }: AuthShellProps) {
   return (
-    <section className="welcome-page signup-page">
-      <main className="welcome-content">
-        <figure>
-          <video src="/amko.mp4" autoPlay muted loop playsInline />
+    <section className="block min-h-dvh w-full overflow-y-auto bg-[#f4f7fb] min-[901px]:flex min-[901px]:items-stretch min-[901px]:overflow-hidden">
+      <div className="relative h-[190px] min-h-[190px] w-full overflow-hidden bg-[#0b1329] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(135deg,rgba(7,13,31,0.55),rgba(7,13,31,0.12)_50%,rgba(7,13,31,0.55))] min-[601px]:h-60 min-[601px]:min-h-60 min-[901px]:h-auto min-[901px]:min-h-dvh min-[901px]:w-[55%]">
+        <figure className="absolute inset-0 size-full">
+          <video src="/amko.mp4" className="block size-full object-cover object-center" autoPlay muted loop playsInline />
         </figure>
-      </main>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        width="100%"
-        maxWidth={400}
-        mx="auto"
-        gap={2}
-        px={{ xs: 2, sm: 4 }}
-        py={6}
-      >
-        <Typography variant="h4" sx={{ color: "text.primary", textAlign: "center", fontWeight: 600 }}>
+      </div>
+
+      <div className="relative z-[2] flex min-h-[calc(100dvh-190px)] w-full flex-col items-center justify-center gap-4 bg-[radial-gradient(circle_at_15%_15%,rgba(59,130,246,0.08),transparent_30%),linear-gradient(145deg,#f8fafc,#eef3f8)] px-5 py-8 min-[601px]:min-h-[calc(100dvh-240px)] min-[601px]:px-6 min-[601px]:py-10 min-[901px]:min-h-dvh min-[901px]:w-[45%] min-[901px]:px-[7%] min-[901px]:py-12 min-[901px]:shadow-[-12px_0_35px_rgba(15,23,42,0.08)]">
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 1,
+            color: "#0f172a",
+            textAlign: "center",
+            fontWeight: 700,
+            letterSpacing: "-0.6px",
+            fontSize: { xs: "1.7rem", sm: "2rem" },
+          }}
+        >
           {title}
         </Typography>
 
@@ -63,6 +91,7 @@ export default function AuthShell({ title, footerText, footerLink, footerLabel, 
           startIcon={<GoogleIcon />}
           fullWidth
           sx={{
+            ...liftOnHover,
             textTransform: "none",
             borderRadius: 2,
             fontWeight: 500,
@@ -72,13 +101,21 @@ export default function AuthShell({ title, footerText, footerLink, footerLabel, 
             borderColor: "#ccc",
             color: "black",
             backgroundColor: "white",
-            "&:hover": { backgroundColor: "#f5f5f5", borderColor: "#aaa" },
+            "&:hover": { transform: "translateY(-1px)", backgroundColor: "#f5f5f5", borderColor: "#aaa" },
           }}
         >
           Continue with Google
         </Button>
 
-        <Divider sx={{ width: "100%", color: "text.secondary", "&::before, &::after": { borderColor: "divider" } }}>
+        <Divider
+          sx={{
+            width: "100%",
+            color: "#94a3b8",
+            fontSize: "0.8rem",
+            fontWeight: 500,
+            "&::before, &::after": { borderColor: "divider" },
+          }}
+        >
           OR
         </Divider>
 
@@ -86,20 +123,20 @@ export default function AuthShell({ title, footerText, footerLink, footerLabel, 
 
         <Typography variant="body2" sx={{ color: "text.primary", textAlign: "center" }}>
           {footerText}{" "}
-          <Link href={footerLink} style={{ color: "#fe7f2d", fontWeight: 500, textDecoration: "none" }}>
+          <Link href={footerLink} className="font-medium text-[#fe7f2d] no-underline transition-colors hover:underline">
             {footerLabel}
           </Link>
         </Typography>
-      </Box>
+      </div>
     </section>
   );
 }
 
-export function FormField({ label, children }) {
+export function FormField({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <Box display="flex" flexDirection="column" gap={1}>
-      <label style={{ fontWeight: 500 }}>{label}</label>
+    <div className="flex flex-col gap-2">
+      <label className="font-medium">{label}</label>
       {children}
-    </Box>
+    </div>
   );
 }

@@ -1,26 +1,35 @@
-import { useMemo, useReducer } from "react";
+import { roundMoney, todayIso, toNumber } from "./format";
+import type { Invoice, InvoiceAction, InvoiceItem, InvoiceTotals, Party } from "./types";
 
-const createItem = () => ({ id: crypto.randomUUID(), description: "", quantity: 1, rate: 0 });
+export const MAX_ITEMS = 100;
 
-const createInitialInvoice = () => ({
+export const createItem = (): InvoiceItem => ({ id: crypto.randomUUID(), description: "", quantity: 1, rate: 0 });
+
+export const emptyParty = (): Party => ({ name: "", email: "", phone: "", address: "" });
+
+export const createInitialInvoice = (): Invoice => ({
   invoiceNumber: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
-  invoiceDate: new Date().toISOString().slice(0, 10),
+  invoiceDate: todayIso(),
   dueDate: "",
   currency: "INR",
-  sender: { name: "", email: "", address: "" },
-  client: { name: "", email: "", address: "" },
+  sender: emptyParty(),
+  client: emptyParty(),
   items: [{ ...createItem(), description: "Website Design", rate: 1500 }],
+  taxLabel: "Tax",
   taxRate: 0,
   discount: 0,
   notes: "",
+  logo: null,
 });
 
-function reducer(state, action) {
+export function invoiceReducer(state: Invoice, action: InvoiceAction): Invoice {
   switch (action.type) {
     case "SET_FIELD":
       return { ...state, [action.field]: action.value };
     case "SET_PARTY_FIELD":
       return { ...state, [action.party]: { ...state[action.party], [action.field]: action.value } };
+    case "SET_LOGO":
+      return { ...state, logo: action.value };
     case "UPDATE_ITEM":
       return {
         ...state,
@@ -29,27 +38,23 @@ function reducer(state, action) {
         ),
       };
     case "ADD_ITEM":
+      if (state.items.length >= MAX_ITEMS) return state;
       return { ...state, items: [...state.items, createItem()] };
     case "REMOVE_ITEM":
       if (state.items.length === 1) return state;
       return { ...state, items: state.items.filter((item) => item.id !== action.id) };
+    case "RESET":
+      return action.invoice;
     default:
       return state;
   }
 }
 
-export function calculateTotals(invoice) {
-  const subtotal = invoice.items.reduce(
-    (sum, item) => sum + Number(item.quantity || 0) * Number(item.rate || 0),
-    0,
-  );
-  const taxAmount = subtotal * (Number(invoice.taxRate || 0) / 100);
-  const discount = Number(invoice.discount || 0);
-  return { subtotal, taxAmount, discount, total: Math.max(0, subtotal + taxAmount - discount) };
-}
+export const lineAmount = (item: InvoiceItem): number => roundMoney(toNumber(item.quantity) * toNumber(item.rate));
 
-export default function useInvoice() {
-  const [invoice, dispatch] = useReducer(reducer, undefined, createInitialInvoice);
-  const totals = useMemo(() => calculateTotals(invoice), [invoice]);
-  return { invoice, totals, dispatch };
+export function calculateTotals(invoice: Invoice): InvoiceTotals {
+  const subtotal = roundMoney(invoice.items.reduce((sum, item) => sum + lineAmount(item), 0));
+  const taxAmount = roundMoney(subtotal * (Math.max(0, toNumber(invoice.taxRate)) / 100));
+  const discount = roundMoney(Math.max(0, toNumber(invoice.discount)));
+  return { subtotal, taxAmount, discount, total: Math.max(0, roundMoney(subtotal + taxAmount - discount)) };
 }

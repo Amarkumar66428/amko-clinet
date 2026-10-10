@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, CircularProgress, TextField } from "@mui/material";
 import AuthShell, { FormField, submitSx, textFieldSx } from "@/components/AuthShell";
-import authService from "@/lib/authService";
+import authService, { type SignUpPayload } from "@/lib/authService";
 import { notify } from "@/lib/notify";
+import type { ApiError } from "@/lib/api";
 
-const FIELDS = [
+const FIELDS: { label: string; field: keyof SignUpPayload; placeholder: string; type?: string }[] = [
   { label: "First Name", field: "firstName", placeholder: "John" },
   { label: "Last Name", field: "lastName", placeholder: "Doe" },
   { label: "Email", field: "email", placeholder: "demo@example.com" },
@@ -19,9 +20,9 @@ const PASSWORD_RULE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "" });
+  const [form, setForm] = useState<SignUpPayload>({ firstName: "", lastName: "", email: "", password: "" });
 
-  const handleSignUp = async (e) => {
+  const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Object.values(form).some((value) => !value)) {
       notify("Please fill all the fields", "error");
@@ -42,7 +43,7 @@ export default function SignupPage() {
         router.push("/auth/signin");
       }
     } catch (error) {
-      notify(error?.message || "Signup failed", "error");
+      notify((error as ApiError)?.message || "Signup failed", "error");
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +51,7 @@ export default function SignupPage() {
 
   return (
     <AuthShell title="Signup" footerText="Already have an account?" footerLink="/auth/signin" footerLabel="Sign In">
-      <form style={{ width: "100%" }} onSubmit={handleSignUp}>
+      <form className="w-full" onSubmit={handleSignUp}>
         <Box display="flex" flexDirection="column" gap={2}>
           {FIELDS.map(({ label, field, placeholder, type = "text" }) => (
             <FormField key={field} label={label}>

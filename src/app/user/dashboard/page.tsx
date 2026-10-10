@@ -1,10 +1,12 @@
-export const metadata = { title: "Dashboard | AMKO" };
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Dashboard | AMKO" };
 
 export default function DashboardPage() {
   return (
-    <div style={{ padding: "16px" }}>
-      <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: 8 }}>Dashboard</h1>
-      <p style={{ color: "#64748b" }}>Welcome to your dashboard!</p>
+    <div className="p-4">
+      <h1 className="mb-2 text-[2rem] font-bold">Dashboard</h1>
+      <p className="text-slate-500">Welcome to your dashboard!</p>
     </div>
   );
 }

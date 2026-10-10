@@ -6,23 +6,34 @@ Welcome to **amko**, an invite-only SaaS eCommerce platform where entrepreneurs 
 
 ## 🛠️ Development
 
-Built with [Next.js](https://nextjs.org) (App Router) and MUI.
+Built with [Next.js](https://nextjs.org) (App Router), TypeScript, MUI and Tailwind CSS v4.
 
 ```bash
 npm install
 npm run dev     # http://localhost:3000
 npm run build && npm start
+npm run lint      # ESLint (next/core-web-vitals + typescript)
+npm run typecheck # tsc --noEmit
+npm run invoice:thumbnails  # re-render gallery thumbnails after editing an invoice template
 ```
+
+### Invoice builder
+
+The invoice builder (`/invoice/templates`, `/invoice/editor/[templateId]`) runs entirely in the browser — no backend:
+
+- PDFs are generated client-side with `@react-pdf/renderer` (vector text, embedded fonts in `public/fonts/invoice`).
+- The preview rasterises that same PDF with `pdf.js`, so what you see is exactly what downloads.
+- Drafts are kept in `localStorage`; templates live in `src/lib/invoice/pdf/InvoiceDocument.tsx` and are registered in `src/lib/invoice/templates.ts`.
 
 Set `NEXT_PUBLIC_API_BASE_URL` (the old `VITE_API_BASE_URL` is still accepted) in `.env`.
 
 | Path | Purpose |
 | --- | --- |
-| `src/app/` | Routes (each folder with a `page.jsx` is a URL) |
+| `src/app/` | Routes (each folder with a `page.tsx` is a URL) |
 | `src/components/` | Shared UI components |
-| `src/lib/` | API client, auth helpers, invoice logic, theme |
-| `src/styles/` | Global and invoice styles |
-| `src/proxy.js` | Redirects signed-out users away from `/user/*` |
+| `src/lib/` | API client, auth helpers, invoice logic, shared types, MUI theme |
+| `src/styles/globals.css` | Tailwind entry point and theme tokens |
+| `src/proxy.ts` | Redirects signed-out users away from `/user/*` |
 
 ---
 

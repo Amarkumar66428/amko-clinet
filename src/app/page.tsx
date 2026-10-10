@@ -28,13 +28,12 @@ import {
   Menu as MenuIcon,
   CheckCircle as CheckCircleIcon,
   Web as WebIcon,
-  Description as DescriptionIcon,
   ReceiptLong as ReceiptIcon,
   Code as CodeIcon,
   Speed as SpeedIcon,
-  Security as SecurityIcon,
   ArrowForward as ArrowForwardIcon,
 } from "@mui/icons-material";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const NAV_ITEMS = [
@@ -74,11 +73,7 @@ export default function HomePage() {
             sx={{ justifyContent: "space-between", py: 1 }}
           >
             <Stack direction="row" alignItems="center" spacing={1}>
-              <img
-                src="/amko.png"
-                alt="AMKO Logo"
-                style={{ width: 35, height: 35 }}
-              />
+              <Image src="/amko.png" alt="AMKO Logo" width={35} height={35} className="size-[35px]" />
               <Typography
                 variant="h6"
                 sx={{ fontWeight: 800, letterSpacing: -0.5 }}
@@ -677,8 +672,8 @@ export default function HomePage() {
                   variant="body2"
                   sx={{ color: "#475569", lineHeight: 1.6 }}
                 >
-                  "The LaTeX resume generator is unbeatable. I updated my resume
-                  in 10 minutes and landed interviews at top tech firms."
+                  &ldquo;The LaTeX resume generator is unbeatable. I updated my resume
+                  in 10 minutes and landed interviews at top tech firms.&rdquo;
                 </Typography>
               </Card>
             </Grid>
@@ -717,9 +712,9 @@ export default function HomePage() {
                   variant="body2"
                   sx={{ color: "#cbd5e1", lineHeight: 1.6 }}
                 >
-                  "Having the site builder and the invoice generator under one
+                  &ldquo;Having the site builder and the invoice generator under one
                   roof saved me hundreds of dollars in SaaS subscriptions each
-                  month."
+                  month.&rdquo;
                 </Typography>
               </Card>
             </Grid>
@@ -754,9 +749,9 @@ export default function HomePage() {
                   variant="body2"
                   sx={{ color: "#475569", lineHeight: 1.6 }}
                 >
-                  "The website builder was so easy to customize. We had our
+                  &ldquo;The website builder was so easy to customize. We had our
                   store up and receiving payments on day one without writing
-                  backend code."
+                  backend code.&rdquo;
                 </Typography>
               </Card>
             </Grid>
@@ -1111,11 +1106,7 @@ export default function HomePage() {
                 alignItems="center"
                 sx={{ mb: 2 }}
               >
-                <img
-                  src="/amko.png"
-                  alt="AMKO Logo"
-                  style={{ width: 35, height: 35 }}
-                />
+                <Image src="/amko.png" alt="AMKO Logo" width={35} height={35} className="size-[35px]" />
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>
                   AMKO
                 </Typography>

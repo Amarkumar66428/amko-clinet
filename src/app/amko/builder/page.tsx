@@ -1,18 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import {
   Box,
   Typography,
   Button,
   IconButton,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Slider,
-  Drawer,
   AppBar,
   Toolbar,
   Stack,
@@ -21,7 +16,6 @@ import {
   CardMedia,
   Divider,
   Paper,
-  Tooltip,
   Chip,
   Dialog,
   DialogTitle,
@@ -35,11 +29,6 @@ import {
   Visibility as PreviewIcon,
   Edit as EditIcon,
   FileDownload as ExportIcon,
-  FileUpload as ImportIcon,
-  RestartAlt as ResetIcon,
-  FormatAlignLeft,
-  FormatAlignCenter,
-  FormatAlignRight,
   ViewQuilt as TemplateIcon,
 } from "@mui/icons-material";
 
@@ -51,6 +40,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  type DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -61,8 +51,42 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+// --- BLOCK MODEL ---
+type BlockType = "HeroSection" | "FeatureCards" | "ProductGrid" | "CallToAction";
+type Align = "left" | "center" | "right";
+
+interface BlockProps {
+  headline?: string;
+  subheadline?: string;
+  buttonText?: string;
+  title?: string;
+  subtitle?: string;
+  title1?: string;
+  desc1?: string;
+  title2?: string;
+  desc2?: string;
+  title3?: string;
+  desc3?: string;
+  item1Title?: string;
+  item1Price?: string;
+  item1Img?: string;
+  item2Title?: string;
+  item2Price?: string;
+  item2Img?: string;
+  textColor?: string;
+  bgColor?: string;
+  paddingY?: number;
+  align?: Align;
+}
+
+interface Block {
+  id: string;
+  type: BlockType;
+  props: BlockProps;
+}
+
 // --- INITIAL TEMPLATES ---
-const TEMPLATES = {
+const TEMPLATES: Record<"service" | "ecommerce", Block[]> = {
   service: [
     {
       id: "comp-1",
@@ -141,7 +165,7 @@ const TEMPLATES = {
 };
 
 // --- DYNAMIC RENDERER FOR BLOCK TYPES ---
-function ComponentRenderer({ component }) {
+function ComponentRenderer({ component }: { component: Block }) {
   const { type, props } = component;
 
   switch (type) {
@@ -316,13 +340,15 @@ function ComponentRenderer({ component }) {
 }
 
 // --- SORTABLE WRAPPER FOR INDIVIDUAL CANVAS BLOCKS ---
-function SortableBlock({
-  component,
-  isSelected,
-  onSelect,
-  onDelete,
-  isPreview,
-}) {
+interface SortableBlockProps {
+  component: Block;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  onDelete: (id: string) => void;
+  isPreview: boolean;
+}
+
+function SortableBlock({ component, isSelected, onSelect, onDelete, isPreview }: SortableBlockProps) {
   const {
     attributes,
     listeners,
@@ -332,7 +358,7 @@ function SortableBlock({
     isDragging,
   } = useSortable({ id: component.id, disabled: isPreview });
 
-  const style = {
+  const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
@@ -410,7 +436,7 @@ function SortableBlock({
 // --- MAIN BUILDER COMPONENT ---
 export default function WebsiteBuilder() {
   const [components, setComponents] = useState(TEMPLATES.service);
-  const [selectedId, setSelectedId] = useState(components[0]?.id || null);
+  const [selectedId, setSelectedId] = useState<string | null>(components[0]?.id || null);
   const [isPreview, setIsPreview] = useState(false);
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [jsonInput, setJsonInput] = useState("");
@@ -429,7 +455,7 @@ export default function WebsiteBuilder() {
     }),
   );
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setComponents((items) => {
@@ -440,7 +466,7 @@ export default function WebsiteBuilder() {
     }
   };
 
-  const updateProp = (key, value) => {
+  const updateProp = <K extends keyof BlockProps>(key: K, value: BlockProps[K]) => {
     setComponents((prev) =>
       prev.map((c) => {
         if (c.id === selectedId) {
@@ -451,9 +477,9 @@ export default function WebsiteBuilder() {
     );
   };
 
-  const addBlock = (type) => {
+  const addBlock = (type: BlockType) => {
     const newId = `comp-${Date.now()}`;
-    let newBlock = { id: newId, type, props: {} };
+    const newBlock: Block = { id: newId, type, props: {} };
 
     if (type === "HeroSection") {
       newBlock.props = {
@@ -505,7 +531,7 @@ export default function WebsiteBuilder() {
     setSelectedId(newId);
   };
 
-  const deleteBlock = (id) => {
+  const deleteBlock = (id: string) => {
     const filtered = components.filter((c) => c.id !== id);
     setComponents(filtered);
     if (selectedId === id) {
@@ -521,10 +547,10 @@ export default function WebsiteBuilder() {
 
   const handleImportJSON = () => {
     try {
-      const parsed = JSON.parse(jsonInput);
+      const parsed: unknown = JSON.parse(jsonInput);
       if (Array.isArray(parsed)) {
-        setComponents(parsed);
-        setSelectedId(parsed[0]?.id || null);
+        setComponents(parsed as Block[]);
+        setSelectedId((parsed as Block[])[0]?.id || null);
         setJsonDialogOpen(false);
       } else {
         alert("Invalid JSON structure: Root must be an array of components.");
@@ -893,7 +919,7 @@ export default function WebsiteBuilder() {
                         Alignment
                       </Typography>
                       <Stack direction="row" spacing={1}>
-                        {["left", "center", "right"].map((align) => (
+                        {(["left", "center", "right"] as const).map((align) => (
                           <Button
                             key={align}
                             variant={
@@ -1062,7 +1088,7 @@ export default function WebsiteBuilder() {
                     value={selectedComponent.props.paddingY || 40}
                     min={16}
                     max={120}
-                    onChange={(_, val) => updateProp("paddingY", val)}
+                    onChange={(_, val) => updateProp("paddingY", val as number)}
                   />
                 </Box>
               </Stack>

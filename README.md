@@ -4,6 +4,28 @@ Welcome to **amko**, an invite-only SaaS eCommerce platform where entrepreneurs 
 
 ---
 
+## 🛠️ Development
+
+Built with [Next.js](https://nextjs.org) (App Router) and MUI.
+
+```bash
+npm install
+npm run dev     # http://localhost:3000
+npm run build && npm start
+```
+
+Set `NEXT_PUBLIC_API_BASE_URL` (the old `VITE_API_BASE_URL` is still accepted) in `.env`.
+
+| Path | Purpose |
+| --- | --- |
+| `src/app/` | Routes (each folder with a `page.jsx` is a URL) |
+| `src/components/` | Shared UI components |
+| `src/lib/` | API client, auth helpers, invoice logic, theme |
+| `src/styles/` | Global and invoice styles |
+| `src/proxy.js` | Redirects signed-out users away from `/user/*` |
+
+---
+
 ## 🚀 Features at a Glance
 
 | Feature                        | Description                                                    |
